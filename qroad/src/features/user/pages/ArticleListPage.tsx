@@ -1,0 +1,1 @@
+export { QRLandingPage as ArticleListPage } from './qrlandingPage'

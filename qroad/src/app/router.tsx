@@ -2,7 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AdminLayout } from '@/shared/components/Layout/AdminLayout'
 
 // User Pages
-import { QRLanding } from '@/features/user/pages/qrlandingPage'
+import { QRLandingPage } from '@/features/user/pages/qrlandingPage'
 import { ArticleDetailWrapper } from '@/features/user/pages/ArticleDetailPageWrapper'
 
 // Admin Pages
@@ -17,7 +17,7 @@ export const router = createBrowserRouter([
   // 사용자 페이지
   {
     path: '/a/:id',
-    element: <QRLanding />,
+    element: <QRLandingPage />,
   },
   {
     path: '/a/article/:articleId',

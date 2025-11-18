@@ -61,7 +61,7 @@ export function ArticleList({ onArticleClick }: ArticleListProps) {
 	);
 }
 
-export function QRLanding() {
+export function QRLandingPage() {
 	const navigate = useNavigate();
 
 	const handleArticleClick = (id: number) => {
