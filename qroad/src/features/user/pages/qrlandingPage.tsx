@@ -46,15 +46,22 @@ export function ArticleList({ onArticleClick }: ArticleListProps) {
 		{/* Article List */}
 		<main className="max-w-md mx-auto px-6 py-12">
 		  <div className="space-y-5">
-			{articles.map((article) => (
-			  <ArticleCard
-				key={article.id}
-				title={article.title}
-				description={article.description}
-				author={article.author}
-				onClick={() => onArticleClick(article.id)}
-			  />
-			))}
+			{articles.map((article) => {
+			  // summary를 100자로 제한
+			  const truncatedSummary = article.summary.length > 100 
+				? article.summary.slice(0, 100) + '...'
+				: article.summary;
+			  
+			  return (
+				<ArticleCard
+				  key={article.id}
+				  title={article.title}
+				  description={truncatedSummary}
+				  author={article.author}
+				  onClick={() => onArticleClick(article.id)}
+				/>
+			  );
+			})}
 		  </div>
 		</main>
 	  </div>
