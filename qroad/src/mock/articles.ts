@@ -128,7 +128,7 @@ export const articles: Article[] = [
         title: "옥천군, 80억 들여 안남면에 ‘주거플랫폼’ 사업 내년 준공",
         description:
           "안남면 연주리에 커뮤니티센터·체육관 등 복합 정주인프라 구축",
-        url: "https://news.joongdo.co.kr/web/view.php?key=20251118010006495",
+        url: "https://joongdo.co.kr/web/view.php?key=20251118010006495",
       },
       {
         title: "‘주거 걱정 덜어드립니다’ 옥천군, 청년 주거비 지원 추가 모집",

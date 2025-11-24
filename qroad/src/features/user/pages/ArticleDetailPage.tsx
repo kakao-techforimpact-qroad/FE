@@ -73,7 +73,7 @@ interface ArticleDetailProps {
 					<Sparkles className="w-5 h-5 text-white" />
 				  </div>
 				  <h2 className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-					AI Summary
+					AI 요약
 				  </h2>
 				</div>
 				<p className="text-base text-foreground/90 leading-relaxed">
@@ -87,7 +87,7 @@ interface ArticleDetailProps {
 			  <div className="flex items-center gap-3">
 				<FileText className="w-6 h-6 text-violet-600" />
 				<h2 className="text-2xl font-bold text-foreground">
-				  Related Articles
+				  연관 기사
 				</h2>
 			  </div>
 			  <div className="grid grid-cols-1 gap-4">
@@ -119,7 +119,7 @@ interface ArticleDetailProps {
 			  <div className="flex items-center gap-3">
 				<Scale className="w-6 h-6 text-violet-600" />
 				<h2 className="text-2xl font-bold text-foreground">
-				  Related Policies
+				  연관 정책
 				</h2>
 			  </div>
 			  <div className="space-y-3">
