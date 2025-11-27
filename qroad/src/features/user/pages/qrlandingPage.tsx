@@ -53,13 +53,13 @@ export function ArticleList({ onArticleClick }: ArticleListProps) {
 				: article.summary;
 			  
 			  return (
-				<ArticleCard
-				  key={article.id}
-				  title={article.title}
+			  <ArticleCard
+				key={article.id}
+				title={article.title}
 				  description={truncatedSummary}
-				  author={article.author}
-				  onClick={() => onArticleClick(article.id)}
-				/>
+				author={article.author}
+				onClick={() => onArticleClick(article.id)}
+			  />
 			  );
 			})}
 		  </div>

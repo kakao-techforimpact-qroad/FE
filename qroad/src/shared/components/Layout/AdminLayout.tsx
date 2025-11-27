@@ -1,116 +1,171 @@
-import { ReactNode } from 'react'
-import { useLocation, useNavigate, Outlet } from 'react-router-dom'
-import { cn } from '@/shared/utils/cn'
-import { FileText, PlusCircle, LogOut } from 'lucide-react'
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Button } from '@/shared/components/ui/button';
+import { LogOut, History, PlusCircle, Menu, ChevronLeft } from 'lucide-react';
+import { useAuth } from '@/features/admin/hooks/useAuth';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { toast } from 'sonner';
 
-const navigation = [
-  { name: 'Article History', href: '/admin/articles', icon: FileText },
-  { name: 'New Article', href: '/admin/publish', icon: PlusCircle },
-]
-
-export const AdminLayout = ({ children }: { children?: ReactNode }) => {
-  const location = useLocation()
-  const navigate = useNavigate()
+export const AdminLayout = () => {
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const handleLogout = () => {
-    navigate('/')
-  }
+    logout();
+    toast.success('로그아웃되었습니다');
+    navigate('/admin/login');
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const menuItems = [
+    {
+      icon: History,
+      label: '기사 이력',
+      path: '/admin/issues',
+      description: '발행된 모든 기사 관리'
+    },
+    {
+      icon: PlusCircle,
+      label: '기사 발행',
+      path: '/admin/issues/create',
+      description: '새로운 기사 발행'
+    }
+  ];
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <aside 
-        className="fixed left-0 top-0 h-screen w-[260px] flex flex-col"
-        style={{
-          background: 'linear-gradient(180deg, #1a0e24 0%, #12091a 100%)',
-        }}
-      >
-        <div className="pt-7 pb-6 px-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div 
-              className="w-12 h-12 rounded-full flex items-center justify-center"
-              style={{
-                background: 'radial-gradient(circle, rgba(124, 58, 237, 0.4) 0%, rgba(124, 58, 237, 0.1) 70%)',
-                boxShadow: '0 0 20px rgba(124, 58, 237, 0.3)',
-              }}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-violet-50 flex flex-col">
+      {/* Top Bar - Always Visible */}
+      <header className="bg-white border-b border-purple-100 shadow-sm z-40 sticky top-0">
+        <div className="flex items-center justify-between px-6 py-4">
+          {/* Left: Logo and Toggle */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleSidebar}
+              className="hover:bg-purple-50 p-2 rounded-lg transition-colors group"
+              title={isSidebarOpen ? "사이드바 숨기기" : "사이드바 열기"}
             >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600" />
+              <motion.div
+                className="w-10 h-10 bg-gradient-to-br from-purple-600 to-violet-600 rounded-xl flex items-center justify-center shadow-lg"
+                animate={{
+                  rotate: [0, 5, -5, 0],
+                  scale: [1, 1.05, 1],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                }}
+              >
+                {isSidebarOpen ? (
+                  <ChevronLeft className="w-5 h-5 text-white" />
+                ) : (
+                  <Menu className="w-5 h-5 text-white" />
+                )}
+              </motion.div>
+            </button>
+            <div>
+              <h1 className="text-xl bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
+                QRoad Admin
+              </h1>
+              <p className="text-xs text-gray-500">관리자 페이지</p>
             </div>
           </div>
-          <h1 className="text-xl font-bold" style={{ color: '#f5f3f7' }}>
-            QR Admin
-          </h1>
-          <p className="text-sm" style={{ color: '#a78bba' }}>
-            Management
-          </p>
+
+          {/* Right: User Info */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-2 bg-purple-50 rounded-lg">
+              <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-violet-600 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">
+                  {user?.username?.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <span className="text-sm font-medium text-gray-900">{user?.username}</span>
+            </div>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              size="sm"
+              className="border-purple-300 text-purple-600 hover:bg-purple-50"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              로그아웃
+            </Button>
+          </div>
         </div>
+      </header>
 
-        <div className="h-px mx-5" style={{ backgroundColor: '#3d2952' }} />
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <AnimatePresence mode="wait">
+          {isSidebarOpen && (
+            <motion.aside
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 288, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="bg-white border-r border-purple-100 shadow-xl flex flex-col overflow-hidden"
+            >
+              {/* Menu Items */}
+              <nav className="flex-1 p-4 space-y-2">
+                {menuItems.map((item, index) => {
+                  const Icon = item.icon;
+                  const active = isActive(item.path);
 
-        <nav className="flex-1 px-5 py-7 space-y-3">
-          {navigation.map((item) => {
-            const isActive = location.pathname === item.href
-            const Icon = item.icon
-            return (
-              <button
-                key={item.name}
-                onClick={() => navigate(item.href)}
-                className={cn(
-                  'w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 text-left',
-                  isActive
-                    ? 'shadow-lg'
-                    : 'hover:bg-[#2d1b3d]'
-                )}
-                style={
-                  isActive
-                    ? {
-                        backgroundColor: '#7c3aed',
-                        color: '#ffffff',
-                        boxShadow: '0 4px 16px rgba(124, 58, 237, 0.4)',
-                      }
-                    : { color: '#f5f3f7' }
-                }
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                <span className="font-medium">{item.name}</span>
-              </button>
-            )
-          })}
-        </nav>
+                  return (
+                    <motion.button
+                      key={item.path}
+                      onClick={() => navigate(item.path)}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05, duration: 0.2 }}
+                      className={`w-full text-left p-4 rounded-xl transition-all duration-200 group ${active
+                        ? 'bg-gradient-to-r from-purple-600 to-violet-600 shadow-lg shadow-purple-500/30'
+                        : 'hover:bg-purple-50 border border-transparent hover:border-purple-200'
+                        }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2 rounded-lg ${active ? 'bg-white/20' : 'bg-purple-100 group-hover:bg-purple-200'
+                          } transition-colors`}>
+                          <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-purple-600'
+                            }`} />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className={`font-semibold ${active ? 'text-white' : 'text-gray-900'
+                            }`}>
+                            {item.label}
+                          </h3>
+                          <p className={`text-xs mt-1 ${active ? 'text-white/80' : 'text-gray-500'
+                            }`}>
+                            {item.description}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </nav>
+            </motion.aside>
+          )}
+        </AnimatePresence>
 
-        <div className="p-5">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl border transition-all duration-300 hover:shadow-md text-left"
-            style={{
-              backgroundColor: '#1a0e24',
-              borderColor: '#3d2952',
-              color: '#f5f3f7',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#5b21b6'
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(124, 58, 237, 0.2)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = '#3d2952'
-              e.currentTarget.style.boxShadow = 'none'
-            }}
-          >
-            <LogOut className="w-5 h-5 flex-shrink-0" />
-            <span className="font-medium">Logout</span>
-          </button>
-        </div>
-      </aside>
-
-      <main 
-        className="flex-1 ml-[260px] overflow-y-auto"
-        style={{
-          background: 'linear-gradient(180deg, #12091a 0%, #1e112b 100%)',
-        }}
-      >
-        <div className="min-h-full p-8">
-          {children || <Outlet />}
-        </div>
-      </main>
+        {/* Main Content */}
+        <motion.main
+          className="flex-1 overflow-auto"
+          animate={{
+            marginLeft: isSidebarOpen ? 0 : 0,
+          }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+        >
+          <Outlet />
+        </motion.main>
+      </div>
     </div>
-  )
-}
+  );
+};

@@ -7,6 +7,7 @@ export interface Article {
   relatedArticles: { title: string; description: string; url: string }[];
   relatedPolicies: { title: string; description: string; url: string }[];
   url: string;
+  keywords?: string[];
 }
 
 export const articles: Article[] = [
@@ -145,7 +146,7 @@ export const articles: Article[] = [
         url: "https://www.korea.kr/news/policyNewsView.do?newsId=148943660",
       },
     ],
-  },{
+  }, {
     id: 5,
     title: "충북만 빠진 농어촌 기본소득 시범지역 … “옥천군 추가선정 촉구” 한 목소리",
     author: "옥천신문",
