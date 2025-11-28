@@ -9,35 +9,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Eye, Calendar, User, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getIssues } from '@/mock/admin/mockData';
 
-const statusMap = {
-    created: { label: '생성', color: 'bg-slate-100 text-slate-700 border-slate-300' },
-    'pre-publish': { label: '발행 전', color: 'bg-amber-100 text-amber-700 border-amber-300' },
-    published: { label: '발행 완료', color: 'bg-emerald-100 text-emerald-700 border-emerald-300' },
-};
+// const statusMap = {
+//     created: { label: '생성', color: 'bg-slate-100 text-slate-700 border-slate-300' },
+//     'pre-publish': { label: '발행 전', color: 'bg-amber-100 text-amber-700 border-amber-300' },
+//     published: { label: '발행 완료', color: 'bg-emerald-100 text-emerald-700 border-emerald-300' },
+// };
 
 const ITEMS_PER_PAGE = 10;
 
 export const IssueList = () => {
     const navigate = useNavigate();
-    const [statusFilter, setStatusFilter] = useState<string>('all');
     const [currentPage, setCurrentPage] = useState(1);
     const issues = getIssues();
 
-    const filteredIssues = statusFilter === 'all'
-        ? issues
-        : issues.filter(issue => issue.status === statusFilter);
-
     // Pagination
-    const totalPages = Math.ceil(filteredIssues.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(issues.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    const paginatedIssues = filteredIssues.slice(startIndex, endIndex);
-
-    // Reset to page 1 when filter changes
-    const handleFilterChange = (value: string) => {
-        setStatusFilter(value);
-        setCurrentPage(1);
-    };
+    const paginatedIssues = issues.slice(startIndex, endIndex);
 
     // Pagination buttons
     const getPageNumbers = () => {
@@ -84,17 +73,17 @@ export const IssueList = () => {
                 className="max-w-7xl mx-auto"
             >
                 {/* Header */}
-                <div className="mb-8">
+                {/* <div className="mb-8">
                     <h1 className="text-4xl bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-3">
                         기사 이력
                     </h1>
                     <p className="text-gray-600">
                         발행된 모든 기사를 확인하고 관리할 수 있습니다
                     </p>
-                </div>
+                </div> */}
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <Card className="border-purple-100 bg-white shadow-sm hover:shadow-md transition-shadow">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
@@ -156,7 +145,7 @@ export const IssueList = () => {
                             </div>
                         </CardContent>
                     </Card>
-                </div>
+                </div> */}
 
                 {/* Main Content Card */}
                 <Card className="shadow-lg border border-purple-100 overflow-hidden p-0">
@@ -175,7 +164,7 @@ export const IssueList = () => {
                     <CardContent className="p-6">
                         {/* Filter */}
                         <div className="mb-6 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
+                            {/* <div className="flex items-center gap-4">
                                 <label className="font-medium text-gray-700">상태 필터:</label>
                                 <Select value={statusFilter} onValueChange={handleFilterChange}>
                                     <SelectTrigger className="w-48 border-purple-200 focus:ring-purple-500">
@@ -188,9 +177,9 @@ export const IssueList = () => {
                                         <SelectItem value="published">발행 완료 ({issues.filter(i => i.status === 'published').length})</SelectItem>
                                     </SelectContent>
                                 </Select>
-                            </div>
+                            </div> */}
                             <div className="text-sm text-gray-500">
-                                총 {filteredIssues.length}개 중 {startIndex + 1}-{Math.min(endIndex, filteredIssues.length)}개 표시
+                                총 {issues.length}개 중 {startIndex + 1}-{Math.min(endIndex, issues.length)}개 표시
                             </div>
                         </div>
 
@@ -200,10 +189,11 @@ export const IssueList = () => {
                                 <TableHeader>
                                     <TableRow className="bg-purple-50 hover:bg-purple-50">
                                         <TableHead className="font-semibold text-center">호수</TableHead>
+                                        <TableHead className="font-semibold text-center">내용</TableHead>
                                         <TableHead className="font-semibold text-center">일자</TableHead>
-                                        <TableHead className="font-semibold text-center">발행자</TableHead>
+                                        {/* <TableHead className="font-semibold text-center">발행자</TableHead> */}
                                         <TableHead className="font-semibold text-center">URL</TableHead>
-                                        <TableHead className="font-semibold text-center">상태</TableHead>
+                                        {/* <TableHead className="font-semibold text-center">상태</TableHead> */}
                                         <TableHead className="font-semibold text-center">확인</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -217,8 +207,13 @@ export const IssueList = () => {
                                             <TableCell className="text-center">
                                                 <div className="flex items-center justify-center gap-2">
                                                     <div className="w-2 h-2 rounded-full bg-purple-600" />
-                                                    <span className="font-semibold text-gray-900">{issue.issue_num}</span>
+                                                    <span className="font-semibold text-gray-900">{issue.issue_title}</span>
                                                 </div>
+                                            </TableCell>
+                                            <TableCell className="text-left max-w-md">
+                                                <p className="text-sm text-gray-600 line-clamp-2">
+                                                    {issue.original_snippet}
+                                                </p>
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 <div className="flex items-center justify-center gap-2 text-gray-600">
@@ -226,14 +221,14 @@ export const IssueList = () => {
                                                     {issue.issue_date}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-center">
+                                            {/* <TableCell className="text-center">
                                                 <div className="flex items-center justify-center gap-2">
                                                     <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
                                                         <User className="w-4 h-4 text-purple-600" />
                                                     </div>
                                                     <span className="text-sm text-gray-700">{issue.publisher || '-'}</span>
                                                 </div>
-                                            </TableCell>
+                                            </TableCell> */}
                                             <TableCell className="text-center max-w-xs">
                                                 <a
                                                     href={issue.url}
@@ -245,13 +240,13 @@ export const IssueList = () => {
                                                     {issue.url}
                                                 </a>
                                             </TableCell>
-                                            <TableCell className="text-center">
+                                            {/* <TableCell className="text-center">
                                                 <div className="flex justify-center">
                                                     <Badge variant="outline" className={statusMap[issue.status].color}>
                                                         {statusMap[issue.status].label}
                                                     </Badge>
                                                 </div>
-                                            </TableCell>
+                                            </TableCell> */}
                                             <TableCell className="text-center">
                                                 <Button
                                                     size="sm"
@@ -271,7 +266,7 @@ export const IssueList = () => {
                             </Table>
                         </div>
 
-                        {filteredIssues.length === 0 && (
+                        {issues.length === 0 && (
                             <div className="text-center py-16">
                                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <FileText className="w-8 h-8 text-purple-600" />
@@ -282,7 +277,7 @@ export const IssueList = () => {
                         )}
 
                         {/* Pagination */}
-                        {filteredIssues.length > 0 && (
+                        {issues.length > 0 && (
                             <div className="flex items-center justify-center gap-2 mt-6">
                                 <Button
                                     variant="outline"

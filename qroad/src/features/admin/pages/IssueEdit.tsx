@@ -14,14 +14,12 @@ import { toast } from 'sonner';
 import { QRCodeGenerator } from '@/shared/components/QRCodeGenerator';
 
 const ArticleCard = ({ article, onSave }: { article: Article; onSave: () => void }) => {
-    const [title, setTitle] = useState(article.title);
     const [summary, setSummary] = useState(article.summary);
     const [keywords, setKeywords] = useState(article.keywords.join(', '));
 
     const handleSave = () => {
         const updatedArticle = {
             ...article,
-            title,
             summary,
             keywords: keywords.split(',').map(k => k.trim()).filter(k => k),
         };
@@ -36,10 +34,10 @@ const ArticleCard = ({ article, onSave }: { article: Article; onSave: () => void
             animate={{ opacity: 1, y: 0 }}
             className="h-full"
         >
-            <Card className="h-full border-purple-200 hover:shadow-xl transition-shadow">
-                <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50">
+            <Card className="h-full border-purple-200 hover:shadow-xl transition-shadow overflow-hidden p-0">
+                <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100 px-4 pt-4 pb-2">
                     <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="bg-white text-purple-700 border-purple-300 font-semibold">
+                        <Badge variant="outline" className="bg-white text-purple-700 border-purple-300 font-medium text-sm px-2.5 py-1">
                             순서: {article.order}
                         </Badge>
                         <div className="text-xs text-gray-500">Article #{article.id}</div>
@@ -47,13 +45,10 @@ const ArticleCard = ({ article, onSave }: { article: Article; onSave: () => void
                 </CardHeader>
                 <CardContent className="space-y-5 p-6">
                     <div className="space-y-2">
-                        <Label htmlFor={`title-${article.id}`} className="text-base font-semibold">제목</Label>
-                        <Input
-                            id={`title-${article.id}`}
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className="border-purple-200 focus:border-purple-400 h-11"
-                        />
+                        <Label className="text-base font-semibold">제목</Label>
+                        <p className="text-gray-900 font-medium px-3 py-2.5 bg-gray-50 rounded-md border border-gray-200">
+                            {article.title}
+                        </p>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor={`summary-${article.id}`} className="text-base font-semibold">AI 요약</Label>
@@ -96,7 +91,6 @@ export const IssueEdit = () => {
     const issue = getIssue(Number(id));
     const [articles, setArticles] = useState(issue ? getArticlesByIssue(issue.id) : []);
     const [qrStatus, setQrStatus] = useState(issue?.qr_status || false);
-    const [qrUrl, setQrUrl] = useState(issue?.qr_url || '');
     const qrCodeRef = useRef<{ download: (fileName?: string) => void }>(null);
 
     if (!issue) {
@@ -127,16 +121,12 @@ export const IssueEdit = () => {
     };
 
     const handleGenerateQR = () => {
-        const url = `https://qroad.app/issue/${issue.id}`;
-
         updateIssue(issue.id, {
-            status: 'published',
+            // status: 'published',
             qr_status: true,
-            qr_url: url,
         });
 
         setQrStatus(true);
-        setQrUrl(url);
         toast.success('✨ QR 코드가 생성되었습니다! 기사가 발행되었습니다.');
     };
 
@@ -147,11 +137,11 @@ export const IssueEdit = () => {
         }
     };
 
-    const statusMap = {
-        created: { label: '생성', color: 'bg-slate-100 text-slate-700 border-slate-300' },
-        'pre-publish': { label: '발행 전', color: 'bg-amber-100 text-amber-700 border-amber-300' },
-        published: { label: '발행 완료', color: 'bg-emerald-100 text-emerald-700 border-emerald-300' },
-    };
+    // const statusMap = {
+    //     created: { label: '생성', color: 'bg-slate-100 text-slate-700 border-slate-300' },
+    //     'pre-publish': { label: '발행 전', color: 'bg-amber-100 text-amber-700 border-amber-300' },
+    //     published: { label: '발행 완료', color: 'bg-emerald-100 text-emerald-700 border-emerald-300' },
+    // };
 
     return (
         <div className="p-8">
@@ -181,9 +171,9 @@ export const IssueEdit = () => {
                                 기사 정보를 확인하고 Article을 수정하며 QR 코드를 생성할 수 있습니다
                             </p>
                         </div>
-                        <Badge variant="outline" className={`${statusMap[issue.status].color} px-4 py-2 text-base`}>
+                        {/* <Badge variant="outline" className={`${statusMap[issue.status].color} px-4 py-2 text-base`}>
                             {statusMap[issue.status].label}
-                        </Badge>
+                        </Badge> */}
                     </div>
                 </div>
 
@@ -227,20 +217,20 @@ export const IssueEdit = () => {
                                         <div className="p-6">
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                                 <div>
-                                                    <Label className="text-sm text-gray-500 mb-2 block">호수/지면 넘버</Label>
-                                                    <p className="font-semibold text-gray-900">{issue.issue_num}</p>
+                                                    <Label className="text-sm text-gray-500 mb-2 block">호수/제목</Label>
+                                                    <p className="font-semibold text-gray-900">{issue.issue_title}</p>
                                                 </div>
                                                 <div>
                                                     <Label className="text-sm text-gray-500 mb-2 block">발행일자</Label>
                                                     <p className="font-semibold text-gray-900">{issue.issue_date}</p>
                                                 </div>
-                                                <div>
+                                                {/* <div>
                                                     <Label className="text-sm text-gray-500 mb-2 block">발행자</Label>
                                                     <div className="flex items-center gap-2">
                                                         <User className="w-4 h-4 text-purple-600" />
                                                         <p className="font-semibold text-gray-900">{issue.publisher || '-'}</p>
                                                     </div>
-                                                </div>
+                                                </div> */}
                                             </div>
                                         </div>
                                     </div>
@@ -376,7 +366,7 @@ export const IssueEdit = () => {
                                                         >
                                                             <QRCodeGenerator
                                                                 ref={qrCodeRef}
-                                                                url={qrUrl}
+                                                                url={issue.url}
                                                                 size={300}
                                                             />
                                                         </motion.div>
@@ -384,7 +374,7 @@ export const IssueEdit = () => {
                                                     <div className="space-y-3">
                                                         <Label className="text-base font-semibold">기사 URL</Label>
                                                         <Input
-                                                            value={qrUrl}
+                                                            value={issue.url}
                                                             readOnly
                                                             className="border-purple-200 bg-purple-50 h-12 text-center font-mono"
                                                         />

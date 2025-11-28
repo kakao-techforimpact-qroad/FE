@@ -12,15 +12,13 @@ export interface Article {
 
 export interface Issue {
     id: number;
-    issue_num: string;
+    issue_title: string;
     issue_date: string;
     raw_text: string;
     original_snippet: string;
     url: string;
-    status: 'created' | 'pre-publish' | 'published';
+    // status: 'created' | 'pre-publish' | 'published';
     qr_status: boolean;
-    qr_url?: string;
-    qr_image?: string;
     articles?: Article[];
     publisher?: string;
 }
@@ -29,36 +27,34 @@ export interface Issue {
 export let mockIssues: Issue[] = [
     {
         id: 1,
-        issue_num: '2024-03-15',
+        issue_title: '1호',
         issue_date: '2024-03-15',
         raw_text: 'Sample raw text for quantum computing article...',
         original_snippet: 'Quantum computing represents a paradigm shift in computational technology...',
-        url: 'https://qroad.app/issue/1',
-        status: 'published',
+        url: 'https://naver.com',
+        // status: 'published',
         qr_status: true,
-        qr_url: 'https://qroad.app/issue/1',
-        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://qroad.app/issue/1',
         publisher: 'QRoad 편집팀',
     },
     {
         id: 2,
-        issue_num: '2024-03-12',
+        issue_title: '2호',
         issue_date: '2024-03-12',
         raw_text: 'Sample raw text for sustainable cities article...',
         original_snippet: 'As urbanization accelerates globally, sustainable city planning has become critical...',
         url: 'https://qroad.app/issue/2',
-        status: 'pre-publish',
+        // status: 'pre-publish',
         qr_status: false,
         publisher: 'QRoad 편집팀',
     },
     {
         id: 3,
-        issue_num: '2024-03-10',
+        issue_title: '3호',
         issue_date: '2024-03-10',
         raw_text: 'Sample raw text for minimalist design article...',
         original_snippet: 'Minimalist design philosophy emphasizes clarity, simplicity, and intentionality...',
         url: 'https://qroad.app/issue/3',
-        status: 'created',
+        // status: 'created',
         qr_status: false,
         publisher: 'QRoad 편집팀',
     },

@@ -14,7 +14,7 @@ export const IssueCreate = () => {
     const navigate = useNavigate();
     const [issueNum, setIssueNum] = useState('');
     const [issueDate, setIssueDate] = useState('');
-    const [publisher, setPublisher] = useState('');
+    // const [publisher, setPublisher] = useState('');
     const [rawText, setRawText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -27,13 +27,13 @@ export const IssueCreate = () => {
             await new Promise(resolve => setTimeout(resolve, 1500));
 
             const newIssue = createIssue({
-                issue_num: issueNum,
+                issue_title: issueNum,
                 issue_date: issueDate,
-                publisher: publisher,
+                // publisher: publisher,
                 raw_text: rawText,
                 original_snippet: rawText.substring(0, 100) + '...',
                 url: `https://qroad.app/issue/${Date.now()}`,
-                status: 'created',
+                // status: 'created',
                 qr_status: false,
             });
 
@@ -95,7 +95,7 @@ export const IssueCreate = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-3">
                                     <Label htmlFor="issue_num" className="text-base">
-                                        호수/지면 넘버 <span className="text-red-500">*</span>
+                                        호수/제목 <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         id="issue_num"
@@ -130,7 +130,7 @@ export const IssueCreate = () => {
                             </div>
 
                             {/* Publisher Field */}
-                            <div className="space-y-3">
+                            {/* <div className="space-y-3">
                                 <Label htmlFor="publisher" className="text-base">
                                     발행자 <span className="text-red-500">*</span>
                                 </Label>
@@ -146,7 +146,7 @@ export const IssueCreate = () => {
                                 <p className="text-xs text-gray-500">
                                     기사를 발행하는 담당자 또는 팀의 이름을 입력하세요
                                 </p>
-                            </div>
+                            </div> */}
 
                             {/* Content Field */}
                             <div className="space-y-3">
