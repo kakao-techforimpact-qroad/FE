@@ -15,15 +15,15 @@ import { AdminLayout } from '@/shared/components/Layout/AdminLayout'
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/a/1" replace />,
+    element: <Navigate to="/admin/login" replace />,
   },
   // 사용자 페이지
   {
-    path: '/a/:id',
+    path: '/a/:paperId',
     element: <QRLandingPage />,
   },
   {
-    path: '/a/article/:articleId',
+    path: '/article/:articleId',
     element: <ArticleDetailWrapper />,
   },
   // 관리자 페이지
@@ -58,4 +58,3 @@ export const router = createBrowserRouter([
     ],
   },
 ])
-

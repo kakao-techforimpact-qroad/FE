@@ -8,24 +8,33 @@ import { Textarea } from '@/shared/components/ui/textarea';
 import { Badge } from '@/shared/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
-import { ArrowLeft, Download, QrCode, Save, Sparkles, FileText, User } from 'lucide-react';
-import { getIssue, getArticlesByIssue, updateArticle, updateIssue, Article } from '@/mock/admin/mockData';
+import { ArrowLeft, Download, QrCode, Save, Sparkles, FileText, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { usePublication, useUpdateArticle } from '@/hooks/admin/usePublications';
 import { toast } from 'sonner';
 import { QRCodeGenerator } from '@/shared/components/QRCodeGenerator';
+import { ArticleInResponse } from '@/types/admin';
 
-const ArticleCard = ({ article, onSave }: { article: Article; onSave: () => void }) => {
+const ArticleCard = ({
+    article,
+    onUpdate
+}: {
+    article: ArticleInResponse;
+    onUpdate: (articleId: number, data: { summary: string; keywords: string[] }) => void;
+}) => {
+    const [isEditing, setIsEditing] = useState(false);
     const [summary, setSummary] = useState(article.summary);
     const [keywords, setKeywords] = useState(article.keywords.join(', '));
 
     const handleSave = () => {
-        const updatedArticle = {
-            ...article,
-            summary,
-            keywords: keywords.split(',').map(k => k.trim()).filter(k => k),
-        };
-        updateArticle(article.id, updatedArticle);
-        toast.success('Article이 저장되었습니다');
-        onSave();
+        const keywordArray = keywords.split(',').map(k => k.trim()).filter(k => k);
+        onUpdate(article.id, { summary, keywords: keywordArray });
+        setIsEditing(false);
+    };
+
+    const handleCancel = () => {
+        setSummary(article.summary);
+        setKeywords(article.keywords.join(', '));
+        setIsEditing(false);
     };
 
     return (
@@ -37,10 +46,17 @@ const ArticleCard = ({ article, onSave }: { article: Article; onSave: () => void
             <Card className="h-full border-purple-200 hover:shadow-xl transition-shadow overflow-hidden p-0">
                 <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100 px-4 pt-4 pb-2">
                     <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="bg-white text-purple-700 border-purple-300 font-medium text-sm px-2.5 py-1">
-                            순서: {article.order}
-                        </Badge>
                         <div className="text-xs text-gray-500">Article #{article.id}</div>
+                        {!isEditing && (
+                            <Button
+                                onClick={() => setIsEditing(true)}
+                                variant="outline"
+                                size="sm"
+                                className="border-purple-300 text-purple-600 hover:bg-purple-50"
+                            >
+                                수정하기
+                            </Button>
+                        )}
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-5 p-6">
@@ -52,33 +68,66 @@ const ArticleCard = ({ article, onSave }: { article: Article; onSave: () => void
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor={`summary-${article.id}`} className="text-base font-semibold">AI 요약</Label>
-                        <Textarea
-                            id={`summary-${article.id}`}
-                            value={summary}
-                            onChange={(e) => setSummary(e.target.value)}
-                            rows={5}
-                            className="border-purple-200 focus:border-purple-400 resize-none"
-                        />
+                        {isEditing ? (
+                            <Textarea
+                                id={`summary-${article.id}`}
+                                value={summary}
+                                onChange={(e) => setSummary(e.target.value)}
+                                rows={5}
+                                className="border-purple-200 focus:border-purple-400 resize-none"
+                            />
+                        ) : (
+                            <p className="text-gray-700 px-3 py-2.5 bg-gray-50 rounded-md border border-gray-200 min-h-[120px] whitespace-pre-wrap">
+                                {article.summary}
+                            </p>
+                        )}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor={`keywords-${article.id}`} className="text-base font-semibold">키워드</Label>
-                        <Input
-                            id={`keywords-${article.id}`}
-                            value={keywords}
-                            onChange={(e) => setKeywords(e.target.value)}
-                            className="border-purple-200 focus:border-purple-400 h-11"
-                            placeholder="키워드1, 키워드2, 키워드3"
-                        />
-                        <p className="text-xs text-gray-500">쉼표(,)로 구분하여 입력하세요</p>
+                        {isEditing ? (
+                            <>
+                                <Input
+                                    id={`keywords-${article.id}`}
+                                    value={keywords}
+                                    onChange={(e) => setKeywords(e.target.value)}
+                                    className="border-purple-200 focus:border-purple-400 h-11"
+                                    placeholder="키워드1, 키워드2, 키워드3"
+                                />
+                                <p className="text-xs text-gray-500">쉼표(,)로 구분하여 입력하세요</p>
+                            </>
+                        ) : (
+                            <div className="flex flex-wrap gap-2">
+                                {article.keywords.map((keyword, index) => (
+                                    <Badge
+                                        key={index}
+                                        className="bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 border border-purple-200 px-3 py-1 text-sm font-medium"
+                                    >
+                                        #{keyword}
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                    <Button
-                        onClick={handleSave}
-                        className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 h-11 shadow-md"
-                        size="lg"
-                    >
-                        <Save className="w-4 h-4 mr-2" />
-                        저장하기
-                    </Button>
+                    {isEditing && (
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={handleSave}
+                                className="flex-1 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 h-11 shadow-md"
+                                size="lg"
+                            >
+                                <Save className="w-4 h-4 mr-2" />
+                                저장하기
+                            </Button>
+                            <Button
+                                onClick={handleCancel}
+                                variant="outline"
+                                className="border-gray-300 text-gray-700 hover:bg-gray-50 h-11"
+                                size="lg"
+                            >
+                                취소
+                            </Button>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </motion.div>
@@ -88,12 +137,27 @@ const ArticleCard = ({ article, onSave }: { article: Article; onSave: () => void
 export const IssueEdit = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const issue = getIssue(Number(id));
-    const [articles, setArticles] = useState(issue ? getArticlesByIssue(issue.id) : []);
-    const [qrStatus, setQrStatus] = useState(issue?.qr_status || false);
+    const { data: publication, isLoading, error } = usePublication(Number(id));
+    const updateArticleMutation = useUpdateArticle(Number(id));
+    const [qrStatus, setQrStatus] = useState(false);
     const qrCodeRef = useRef<{ download: (fileName?: string) => void }>(null);
 
-    if (!issue) {
+    // 페이지네이션 상태
+    const [currentPage, setCurrentPage] = useState(1);
+    const articlesPerPage = 6;
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <Loader2 className="w-16 h-16 text-purple-600 animate-spin mx-auto mb-4" />
+                    <p className="text-gray-600">로딩 중...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !publication) {
         return (
             <div className="p-8">
                 <Card className="max-w-2xl mx-auto">
@@ -116,26 +180,29 @@ export const IssueEdit = () => {
         );
     }
 
-    const handleArticleSave = () => {
-        setArticles(getArticlesByIssue(issue.id));
+    const handleArticleUpdate = (articleId: number, data: { summary: string; keywords: string[] }) => {
+        updateArticleMutation.mutate({ articleId, data });
     };
 
     const handleGenerateQR = () => {
-        updateIssue(issue.id, {
-            // status: 'published',
-            qr_status: true,
-        });
-
+        // TODO: QR 생성 API 연결
         setQrStatus(true);
         toast.success('✨ QR 코드가 생성되었습니다! 기사가 발행되었습니다.');
     };
 
     const handleDownloadQR = () => {
         if (qrCodeRef.current) {
-            qrCodeRef.current.download(`qroad-issue-${issue.id}-qr`);
+            qrCodeRef.current.download(`qroad-issue-${publication.paper_id}-qr`);
             toast.success('QR 코드를 다운로드했습니다');
         }
     };
+
+    // 페이지네이션 계산
+    const totalPages = publication ? Math.ceil(publication.articles.length / articlesPerPage) : 0;
+    const startIndex = (currentPage - 1) * articlesPerPage;
+    const endIndex = startIndex + articlesPerPage;
+    const currentArticles = publication ? publication.articles.slice(startIndex, endIndex) : [];
+
 
     // const statusMap = {
     //     created: { label: '생성', color: 'bg-slate-100 text-slate-700 border-slate-300' },
@@ -218,11 +285,11 @@ export const IssueEdit = () => {
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                                 <div>
                                                     <Label className="text-sm text-gray-500 mb-2 block">호수/제목</Label>
-                                                    <p className="font-semibold text-gray-900">{issue.issue_title}</p>
+                                                    <p className="font-semibold text-gray-900">{publication.title}</p>
                                                 </div>
                                                 <div>
                                                     <Label className="text-sm text-gray-500 mb-2 block">발행일자</Label>
-                                                    <p className="font-semibold text-gray-900">{issue.issue_date}</p>
+                                                    <p className="font-semibold text-gray-900">{publication.published_date}</p>
                                                 </div>
                                                 {/* <div>
                                                     <Label className="text-sm text-gray-500 mb-2 block">발행자</Label>
@@ -241,10 +308,10 @@ export const IssueEdit = () => {
                                             <h3 className="font-semibold text-gray-900">URL 정보</h3>
                                         </div>
                                         <div className="p-6 space-y-3">
-                                            <Label className="text-sm text-gray-500">기사 URL</Label>
-                                            <Input value={issue.url} readOnly className="bg-gray-50" />
+                                            <Label className="text-sm text-gray-500">기사 URL (User Landing Page)</Label>
+                                            <Input value={`${window.location.origin}/a/${publication.paper_id}`} readOnly className="bg-gray-50" />
                                             <p className="text-xs text-gray-500">
-                                                이 URL은 QR 코드 생성 시 사용됩니다
+                                                사용자가 QR 코드를 스캔하면 이 URL로 이동합니다
                                             </p>
                                         </div>
                                     </div>
@@ -257,7 +324,7 @@ export const IssueEdit = () => {
                                         </div>
                                         <div className="p-6">
                                             <Textarea
-                                                value={issue.raw_text}
+                                                value={publication.body}
                                                 readOnly
                                                 rows={12}
                                                 className="bg-gray-50 resize-none"
@@ -279,20 +346,48 @@ export const IssueEdit = () => {
                                             </div>
                                         </div>
                                         <Badge className="bg-purple-600 text-white px-4 py-2 text-base">
-                                            총 {articles.length}개
+                                            총 {publication.article_count}개
                                         </Badge>
                                     </div>
 
                                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                                        {articles.map((article) => (
+                                        {currentArticles.map((article: ArticleInResponse) => (
                                             <ArticleCard
                                                 key={article.id}
                                                 article={article}
-                                                onSave={handleArticleSave}
+                                                onUpdate={handleArticleUpdate}
                                             />
                                         ))}
                                     </div>
-                                    {articles.length === 0 && (
+
+                                    {/* 페이지네이션 */}
+                                    {totalPages > 1 && (
+                                        <div className="flex items-center justify-center gap-2 mt-8">
+                                            <Button
+                                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                                disabled={currentPage === 1}
+                                                variant="outline"
+                                                size="sm"
+                                                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50"
+                                            >
+                                                <ChevronLeft className="w-4 h-4" />
+                                            </Button>
+                                            <span className="text-sm text-gray-600">
+                                                {currentPage} / {totalPages}
+                                            </span>
+                                            <Button
+                                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                                disabled={currentPage === totalPages}
+                                                variant="outline"
+                                                size="sm"
+                                                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50"
+                                            >
+                                                <ChevronRight className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    )}
+
+                                    {publication.articles.length === 0 && (
                                         <div className="text-center py-20">
                                             <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                                 <Sparkles className="w-10 h-10 text-purple-600" />
@@ -366,7 +461,7 @@ export const IssueEdit = () => {
                                                         >
                                                             <QRCodeGenerator
                                                                 ref={qrCodeRef}
-                                                                url={issue.url}
+                                                                url={`${window.location.origin}/a/${publication.paper_id}`}
                                                                 size={300}
                                                             />
                                                         </motion.div>
@@ -374,7 +469,7 @@ export const IssueEdit = () => {
                                                     <div className="space-y-3">
                                                         <Label className="text-base font-semibold">기사 URL</Label>
                                                         <Input
-                                                            value={issue.url}
+                                                            value={`${window.location.origin}/a/${publication.paper_id}`}
                                                             readOnly
                                                             className="border-purple-200 bg-purple-50 h-12 text-center font-mono"
                                                         />

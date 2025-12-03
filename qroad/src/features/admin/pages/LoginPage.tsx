@@ -1,34 +1,24 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Sparkles } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
-import { toast } from 'sonner';
+import { useLogin } from '@/hooks/admin/useAuth';
 
 export const LoginPage = () => {
-    const [username, setUsername] = useState('');
+    const [loginId, setLoginId] = useState('');
     const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const { login } = useAuth();
-    const navigate = useNavigate();
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const loginMutation = useLogin();
+
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
-
-        try {
-            await login(username, password);
-            toast.success('로그인 성공!');
-            navigate('/admin/issues');
-        } catch (error) {
-            toast.error('로그인 실패');
-        } finally {
-            setIsLoading(false);
-        }
+        loginMutation.mutate({
+            loginId: loginId,
+            password: password,
+        });
     };
 
     return (
@@ -72,15 +62,16 @@ export const LoginPage = () => {
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="username">사용자 ID</Label>
+                                <Label htmlFor="loginId">아이디</Label>
                                 <Input
-                                    id="username"
+                                    id="loginId"
                                     type="text"
-                                    placeholder="admin"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
+                                    placeholder="아이디를 입력하세요"
+                                    value={loginId}
+                                    onChange={(e) => setLoginId(e.target.value)}
                                     className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                                     required
+                                    disabled={loginMutation.isPending}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -88,23 +79,21 @@ export const LoginPage = () => {
                                 <Input
                                     id="password"
                                     type="password"
-                                    placeholder="••••••••"
+                                    placeholder="비밀번호를 입력하세요"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                                     required
+                                    disabled={loginMutation.isPending}
                                 />
                             </div>
                             <Button
                                 type="submit"
-                                disabled={isLoading}
+                                disabled={loginMutation.isPending}
                                 className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white"
                             >
-                                {isLoading ? '로그인 중...' : '로그인'}
+                                {loginMutation.isPending ? '로그인 중...' : '로그인'}
                             </Button>
-                            <p className="text-xs text-center text-gray-500 mt-4">
-                                Demo: 아무 ID/비밀번호나 입력하세요
-                            </p>
                         </form>
                     </CardContent>
                 </Card>

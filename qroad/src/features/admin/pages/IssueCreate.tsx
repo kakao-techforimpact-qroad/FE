@@ -7,43 +7,33 @@ import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { ArrowLeft, Sparkles, Send } from 'lucide-react';
-import { createIssue } from '@/mock/admin/mockData';
+import { useCreatePublication } from '@/hooks/admin/usePublications';
 import { toast } from 'sonner';
 
 export const IssueCreate = () => {
     const navigate = useNavigate();
     const [issueNum, setIssueNum] = useState('');
     const [issueDate, setIssueDate] = useState('');
-    // const [publisher, setPublisher] = useState('');
     const [rawText, setRawText] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+
+    const createMutation = useCreatePublication();
+    const isLoading = createMutation.isPending;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
 
-        try {
-            // Simulate AI processing delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            const newIssue = createIssue({
-                issue_title: issueNum,
-                issue_date: issueDate,
-                // publisher: publisher,
-                raw_text: rawText,
-                original_snippet: rawText.substring(0, 100) + '...',
-                url: `https://qroad.app/issue/${Date.now()}`,
-                // status: 'created',
-                qr_status: false,
-            });
-
-            toast.success('✨ 기사가 성공적으로 생성되었습니다!');
-            navigate(`/admin/issues/${newIssue.id}`);
-        } catch (error) {
-            toast.error('기사 생성 중 오류가 발생했습니다');
-        } finally {
-            setIsLoading(false);
+        // 날짜 형식 검증
+        if (!issueDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            toast.error('올바른 날짜 형식을 선택해주세요');
+            return;
         }
+
+        // API 호출
+        createMutation.mutate({
+            title: issueNum,
+            content: rawText,
+            publishedDate: issueDate,
+        });
     };
 
     return (
