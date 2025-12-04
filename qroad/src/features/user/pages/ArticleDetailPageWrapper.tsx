@@ -1,14 +1,25 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArticleDetail } from './ArticleDetailPage';
-import { articles } from '@/mock/articles';
+import { useArticleDetail } from '@/hooks/user/useLandingPage';
+import { Loader2 } from 'lucide-react';
 
 export function ArticleDetailWrapper() {
 	const navigate = useNavigate();
 	const { articleId } = useParams();
-	
-	const article = articles.find((a) => a.id === Number(articleId));
+	const { data: article, isLoading, error } = useArticleDetail(Number(articleId));
 
-	if (!article) {
+	if (isLoading) {
+		return (
+			<div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 flex items-center justify-center">
+				<div className="text-center">
+					<Loader2 className="w-16 h-16 text-purple-600 animate-spin mx-auto mb-4" />
+					<p className="text-gray-600">기사를 불러오는 중...</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (error || !article) {
 		return (
 			<div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 flex items-center justify-center px-6">
 				<div className="text-center space-y-4">
@@ -25,10 +36,9 @@ export function ArticleDetailWrapper() {
 	}
 
 	return (
-		<ArticleDetail 
-			article={article} 
-			onBack={() => navigate(-1)} 
+		<ArticleDetail
+			article={article}
+			onBack={() => navigate(-1)}
 		/>
 	);
 }
-
