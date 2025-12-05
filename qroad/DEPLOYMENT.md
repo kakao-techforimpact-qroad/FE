@@ -1,149 +1,187 @@
-# Vercel 배포 가이드 (qroad.info)
+# Git을 통한 Vercel 배포 가이드
 
-## 1. Vercel 프로젝트 설정
+## 1. GitHub 저장소 준비
 
-### 도메인 설정
-- **프로덕션 도메인**: `qroad.info`
-- **API 서버**: `api.qroad.info`
-
-### 환경 변수 설정
-
-Vercel 대시보드 → Settings → Environment Variables에서 설정:
+### 1.1 Git 초기화 (아직 안 했다면)
 
 ```bash
-# 비워두거나 설정하지 않음 (Vercel rewrites 사용)
-VITE_API_BASE_URL=
+cd /Users/jongsookim/Desktop/FE/qroad
+git init
+git add .
+git commit -m "Initial commit: QRoad project"
 ```
 
-**중요**: `VITE_API_BASE_URL`을 비워두면 상대 경로(`/api`)로 요청하고, Vercel rewrites가 자동으로 `https://api.qroad.info/api`로 프록시합니다.
+### 1.2 GitHub 저장소 생성 및 연결
 
-## 2. CORS 처리 방식
-
-### Vercel Rewrites (권장)
-`vercel.json`에 설정된 rewrites를 통해 CORS 문제 해결:
-
-```json
-{
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://api.qroad.info/api/:path*"
-    }
-  ]
-}
-```
-
-**작동 방식**:
-1. 프론트엔드에서 `/api/admin/login` 요청
-2. Vercel이 `https://api.qroad.info/api/admin/login`으로 프록시
-3. 같은 도메인(qroad.info)에서 요청하므로 CORS 문제 없음
-
-### 백엔드 CORS 설정 (필수)
-
-백엔드(`api.qroad.info`)에서 다음 도메인 허용:
-
-```
-Access-Control-Allow-Origin: https://qroad.info
-Access-Control-Allow-Credentials: true
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-Access-Control-Allow-Headers: Content-Type, Authorization
-```
-
-## 3. 배포 단계
-
-### 3.1 로컬 빌드 테스트
+1. GitHub에서 새 저장소 생성 (예: `qroad-frontend`)
+2. 로컬 저장소와 연결:
 
 ```bash
-# 빌드
-npm run build
-
-# 프리뷰
-npm run preview
+git remote add origin https://github.com/YOUR_USERNAME/qroad-frontend.git
+git branch -M main
+git push -u origin main
 ```
 
-### 3.2 Vercel 배포
+## 2. Vercel과 GitHub 연동
+
+### 2.1 Vercel 대시보드에서 설정
+
+1. **Vercel 대시보드 접속**: https://vercel.com/dashboard
+2. **"Add New..." → Project** 클릭
+3. **"Import Git Repository"** 선택
+4. **GitHub 계정 연결** (처음이라면)
+5. **저장소 선택**: `qroad-frontend` 선택
+6. **Import** 클릭
+
+### 2.2 프로젝트 설정
+
+**Framework Preset**: Vite (자동 감지됨)
+
+**Build Settings**:
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Install Command: `npm install`
+
+**Environment Variables**:
+```
+VITE_API_BASE_URL = (비워두기)
+```
+
+### 2.3 도메인 설정
+
+1. **Settings → Domains**
+2. **Add Domain**: `qroad.info` 입력
+3. **Add** 클릭
+4. DNS 설정 확인 (이미 설정되어 있음)
+
+## 3. 자동 배포 설정
+
+### 3.1 브랜치별 배포
+
+- **main 브랜치**: 프로덕션 배포 (`qroad.info`)
+- **develop 브랜치**: 프리뷰 배포 (자동 생성된 URL)
+- **기타 브랜치**: PR별 프리뷰 배포
+
+### 3.2 배포 트리거
 
 ```bash
-# 첫 배포
-vercel
-
 # 프로덕션 배포
-vercel --prod
+git add .
+git commit -m "Update: feature description"
+git push origin main
 ```
 
-### 3.3 도메인 연결
+**자동으로**:
+1. GitHub에 push
+2. Vercel이 자동으로 감지
+3. 빌드 시작
+4. 성공하면 자동 배포
+5. `qroad.info`에 반영
 
-1. Vercel 대시보드 → Settings → Domains
-2. `qroad.info` 추가
-3. DNS 설정:
+## 4. 배포 확인
+
+### 4.1 Vercel 대시보드에서 확인
+
+- **Deployments** 탭에서 배포 상태 확인
+- **Logs** 탭에서 빌드 로그 확인
+- **Functions** 탭에서 Serverless Functions 확인 (있다면)
+
+### 4.2 배포 URL
+
+- **프로덕션**: https://qroad.info
+- **프리뷰**: https://qroad-frontend-xxx.vercel.app
+
+## 5. 환경 변수 설정
+
+### 5.1 Vercel 대시보드에서 설정
+
+1. **Settings → Environment Variables**
+2. **Add New**:
+   - Name: `VITE_API_BASE_URL`
+   - Value: (비워두기)
+   - Environment: Production, Preview, Development 모두 선택
+3. **Save**
+
+### 5.2 재배포
+
+환경 변수 변경 후:
+1. **Deployments** 탭
+2. 최신 배포 선택
+3. **... → Redeploy** 클릭
+
+## 6. 트러블슈팅
+
+### 빌드 실패 시
+
+1. **로컬에서 빌드 테스트**:
+   ```bash
+   npm run build
    ```
-   A     @       76.76.21.21
-   CNAME www     cname.vercel-dns.com
-   ```
 
-## 4. 환경별 설정
+2. **Vercel 로그 확인**:
+   - Deployments → 실패한 배포 클릭 → Logs 확인
 
-### 개발 환경 (localhost:3000)
-- Vite 프록시 사용 (`vite.config.ts`)
-- `/api` → `https://api.qroad.info`
+3. **환경 변수 확인**:
+   - Settings → Environment Variables 확인
 
-### 프로덕션 (qroad.info)
-- Vercel rewrites 사용 (`vercel.json`)
-- `/api` → `https://api.qroad.info/api`
+### CORS 에러 시
 
-## 5. 트러블슈팅
+1. **vercel.json 확인**:
+   - rewrites 설정 확인
+   - 배포 후 적용되었는지 확인
 
-### CORS 에러 발생 시
-
-1. **Vercel rewrites 확인**
-   - `vercel.json` 설정 확인
-   - Vercel 대시보드에서 배포 로그 확인
-
-2. **백엔드 CORS 설정 확인**
+2. **백엔드 CORS 설정 확인**:
    ```bash
    curl -I https://api.qroad.info/api/admin/login \
      -H "Origin: https://qroad.info"
    ```
-   
-   응답 헤더에 다음이 포함되어야 함:
-   ```
-   Access-Control-Allow-Origin: https://qroad.info
-   Access-Control-Allow-Credentials: true
-   ```
 
-3. **쿠키 전송 확인**
-   - `withCredentials: true` 설정 확인 (`src/api/client.ts`)
-   - 백엔드에서 `SameSite=None; Secure` 쿠키 설정
+## 7. Git 워크플로우
 
-### 빌드 에러 발생 시
+### 7.1 기능 개발
 
 ```bash
-# 캐시 삭제
-rm -rf node_modules dist
-npm install
-npm run build
+# 새 브랜치 생성
+git checkout -b feature/new-feature
+
+# 개발 및 커밋
+git add .
+git commit -m "Add: new feature"
+
+# GitHub에 push
+git push origin feature/new-feature
 ```
 
-## 6. 체크리스트
+→ Vercel이 자동으로 프리뷰 배포 생성
 
-배포 전 확인사항:
-
-- [ ] `vercel.json` rewrites 설정 확인
-- [ ] 환경 변수 설정 (비워두기)
-- [ ] 로컬 빌드 성공 확인
-- [ ] 백엔드 CORS 설정 확인
-- [ ] 도메인 DNS 설정 완료
-- [ ] SSL 인증서 자동 발급 확인
-
-## 7. 유용한 명령어
+### 7.2 프로덕션 배포
 
 ```bash
-# Vercel 로그 확인
-vercel logs
+# main 브랜치로 이동
+git checkout main
 
-# 환경 변수 확인
-vercel env ls
+# 최신 변경사항 병합
+git merge feature/new-feature
 
-# 배포 취소
-vercel rollback
+# 프로덕션 배포
+git push origin main
 ```
+
+→ Vercel이 자동으로 `qroad.info`에 배포
+
+## 8. 체크리스트
+
+배포 전 확인:
+
+- [ ] GitHub 저장소 생성 및 코드 push
+- [ ] Vercel과 GitHub 저장소 연동
+- [ ] 환경 변수 설정 (`VITE_API_BASE_URL` 비워두기)
+- [ ] 도메인 설정 (`qroad.info`)
+- [ ] 로컬 빌드 테스트 성공
+- [ ] main 브랜치에 push하여 배포
+
+## 9. 유용한 링크
+
+- **Vercel 대시보드**: https://vercel.com/dashboard
+- **Vercel Git 문서**: https://vercel.com/docs/git
+- **배포 상태 확인**: https://vercel.com/YOUR_USERNAME/qroad-frontend

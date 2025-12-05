@@ -15,6 +15,9 @@ export const LoginPage = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        console.log('=== 로그인 폼 제출 ===');
+        console.log('입력 데이터:', { loginId, password: '***' });
+
         loginMutation.mutate({
             loginId: loginId,
             password: password,
