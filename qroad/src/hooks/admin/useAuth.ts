@@ -70,7 +70,7 @@ export const useLogout = () => {
             toast.success(response?.message || '로그아웃되었습니다');
             navigate('/admin/login');
         },
-        onError: (error: any) => {
+        onError: () => {
             // 에러가 발생해도 로컬 정리
             localStorage.removeItem('admin_session');
             localStorage.removeItem('adminId');
