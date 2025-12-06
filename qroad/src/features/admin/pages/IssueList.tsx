@@ -148,7 +148,7 @@ export const IssueList = () => {
                                         <TableRow
                                             key={publication.id}
                                             className="hover:bg-purple-50/50 cursor-pointer transition-colors"
-                                            onClick={() => navigate(`/ admin / issues / ${publication.id} `)}
+                                            onClick={() => navigate(`/admin/issues/${publication.id}`)}
                                         >
                                             <TableCell className="text-center">
                                                 <div className="flex items-center justify-center gap-2">
