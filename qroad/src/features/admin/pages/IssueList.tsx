@@ -17,15 +17,10 @@ export const IssueList = () => {
 
     // 로그인 직후 환영 메시지 표시
     useEffect(() => {
-        console.log('=== IssueList 마운트 ===');
         const justLoggedIn = localStorage.getItem('justLoggedIn');
         const loginId = localStorage.getItem('loginId');
 
-        console.log('justLoggedIn:', justLoggedIn);
-        console.log('loginId:', loginId);
-
         if (justLoggedIn === 'true') {
-            console.log('로그인 알람 표시!');
             toast.success(`${loginId}님, 로그인했습니다`);
             localStorage.removeItem('justLoggedIn'); // 플래그 제거
         }
@@ -153,7 +148,11 @@ export const IssueList = () => {
                                             <TableCell className="text-center">
                                                 <div className="flex items-center justify-center gap-2">
                                                     <div className="w-2 h-2 rounded-full bg-purple-600" />
-                                                    <span className="font-semibold text-gray-900">{publication.title}</span>
+                                                    <span className="font-semibold text-gray-900">
+                                                        {publication.title.length > 10
+                                                            ? publication.title.slice(0, 10) + '...'
+                                                            : publication.title}
+                                                    </span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-left max-w-md">

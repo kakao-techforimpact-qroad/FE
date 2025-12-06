@@ -13,16 +13,11 @@ export const useLogin = () => {
             return { ...response, loginId: data.loginId };
         },
         onSuccess: (response: any) => {
-            console.log('=== 로그인 성공 ===');
-            console.log('응답 데이터:', response);
-
             // 세션 정보 저장 (백엔드 응답 필드명에 맞게 조정)
             const adminId = response.adminId || response.admin_id || response.id || 'admin';
             const pressCompany = response.pressCompany || response.press_company || response.company || '';
             const session = response.session || response.token || response.sessionToken || 'session';
             const loginId = response.loginId; // 로그인 시 입력한 ID
-
-            console.log('추출된 값:', { adminId, pressCompany, session, loginId });
 
             localStorage.setItem('admin_session', session);
             localStorage.setItem('adminId', String(adminId));
@@ -32,22 +27,10 @@ export const useLogin = () => {
                 localStorage.setItem('pressCompany', pressCompany);
             }
 
-            console.log('localStorage 저장 완료');
-            console.log('저장된 값:', {
-                session: localStorage.getItem('admin_session'),
-                adminId: localStorage.getItem('adminId'),
-                loginId: localStorage.getItem('loginId'),
-                pressCompany: localStorage.getItem('pressCompany')
-            });
-
-            console.log('페이지 이동 시작...');
             // 즉시 페이지 이동
             window.location.href = '/admin/issues';
         },
         onError: (error: any) => {
-            console.error('=== 로그인 실패 ===');
-            console.error('에러:', error);
-            console.error('응답:', error.response);
             toast.error(error.response?.data?.message || '로그인에 실패했습니다');
         },
     });
