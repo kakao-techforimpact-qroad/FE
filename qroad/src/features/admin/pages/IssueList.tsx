@@ -169,13 +169,13 @@ export const IssueList = () => {
                                             </TableCell>
                                             <TableCell className="text-center max-w-xs">
                                                 <a
-                                                    href={`${window.location.origin} /a/${publication.id} `}
+                                                    href={`${window.location.origin}/a/${publication.id}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-blue-600 hover:underline truncate inline-block max-w-full"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    {`${window.location.origin} /a/${publication.id} `}
+                                                    {`${window.location.origin}/a/${publication.id}`}
                                                 </a>
                                             </TableCell>
                                             <TableCell className="text-center">
@@ -184,7 +184,7 @@ export const IssueList = () => {
                                                     className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        navigate(`/ admin / issues / ${publication.id} `);
+                                                        navigate(`/admin/issues/${publication.id}`);
                                                     }}
                                                 >
                                                     <Eye className="w-4 h-4 mr-2" />
