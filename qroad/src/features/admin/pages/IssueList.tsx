@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Button } from '@/shared/components/ui/button';
@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/sha
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { Eye, Calendar, FileText, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { usePublications } from '@/hooks/admin/usePublications';
+import { toast } from 'sonner';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -13,6 +14,22 @@ export const IssueList = () => {
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const { data, isLoading, error } = usePublications({ page: currentPage, limit: ITEMS_PER_PAGE });
+
+    // 로그인 직후 환영 메시지 표시
+    useEffect(() => {
+        console.log('=== IssueList 마운트 ===');
+        const justLoggedIn = localStorage.getItem('justLoggedIn');
+        const loginId = localStorage.getItem('loginId');
+
+        console.log('justLoggedIn:', justLoggedIn);
+        console.log('loginId:', loginId);
+
+        if (justLoggedIn === 'true') {
+            console.log('로그인 알람 표시!');
+            toast.success(`${loginId}님, 로그인했습니다`);
+            localStorage.removeItem('justLoggedIn'); // 플래그 제거
+        }
+    }, []);
 
     // Pagination
     const totalPages = data ? Math.ceil(data.total_count / ITEMS_PER_PAGE) : 0;
@@ -131,7 +148,7 @@ export const IssueList = () => {
                                         <TableRow
                                             key={publication.id}
                                             className="hover:bg-purple-50/50 cursor-pointer transition-colors"
-                                            onClick={() => navigate(`/admin/issues/${publication.id}`)}
+                                            onClick={() => navigate(`/ admin / issues / ${publication.id} `)}
                                         >
                                             <TableCell className="text-center">
                                                 <div className="flex items-center justify-center gap-2">
@@ -152,13 +169,13 @@ export const IssueList = () => {
                                             </TableCell>
                                             <TableCell className="text-center max-w-xs">
                                                 <a
-                                                    href={`${window.location.origin}/a/${publication.id}`}
+                                                    href={`${window.location.origin} /a/${publication.id} `}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-blue-600 hover:underline truncate inline-block max-w-full"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    {`${window.location.origin}/a/${publication.id}`}
+                                                    {`${window.location.origin} /a/${publication.id} `}
                                                 </a>
                                             </TableCell>
                                             <TableCell className="text-center">
@@ -167,7 +184,7 @@ export const IssueList = () => {
                                                     className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        navigate(`/admin/issues/${publication.id}`);
+                                                        navigate(`/ admin / issues / ${publication.id} `);
                                                     }}
                                                 >
                                                     <Eye className="w-4 h-4 mr-2" />
@@ -206,7 +223,7 @@ export const IssueList = () => {
                                 {totalPages > 1 ? (
                                     getPageNumbers().map((page, index) => (
                                         page === '...' ? (
-                                            <span key={`ellipsis-${index}`} className="px-2 text-gray-400">...</span>
+                                            <span key={`ellipsis - ${index} `} className="px-2 text-gray-400">...</span>
                                         ) : (
                                             <Button
                                                 key={page}

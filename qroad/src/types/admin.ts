@@ -86,6 +86,7 @@ export interface ArticleDetailResponse {
     reporter: string;
     publishedDate: string;
     summary: string;
+    keywords: string[];
     articleRelatedDTOS: RelatedArticle[];
     policyArticleRelatedDTOS: RelatedPolicy[];
 }

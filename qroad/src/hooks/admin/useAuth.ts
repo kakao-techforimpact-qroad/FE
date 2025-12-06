@@ -7,7 +7,11 @@ import { LoginRequest } from '@/types/admin';
 // 로그인 Hook
 export const useLogin = () => {
     return useMutation({
-        mutationFn: (data: LoginRequest) => authApi.login(data),
+        mutationFn: async (data: LoginRequest) => {
+            // 로그인 요청 전에 loginId 저장 (성공 시 사용)
+            const response = await authApi.login(data);
+            return { ...response, loginId: data.loginId };
+        },
         onSuccess: (response: any) => {
             console.log('=== 로그인 성공 ===');
             console.log('응답 데이터:', response);
@@ -16,11 +20,14 @@ export const useLogin = () => {
             const adminId = response.adminId || response.admin_id || response.id || 'admin';
             const pressCompany = response.pressCompany || response.press_company || response.company || '';
             const session = response.session || response.token || response.sessionToken || 'session';
+            const loginId = response.loginId; // 로그인 시 입력한 ID
 
-            console.log('추출된 값:', { adminId, pressCompany, session });
+            console.log('추출된 값:', { adminId, pressCompany, session, loginId });
 
             localStorage.setItem('admin_session', session);
             localStorage.setItem('adminId', String(adminId));
+            localStorage.setItem('loginId', loginId); // 입력한 loginId 저장
+            localStorage.setItem('justLoggedIn', 'true'); // 로그인 직후 플래그
             if (pressCompany) {
                 localStorage.setItem('pressCompany', pressCompany);
             }
@@ -29,13 +36,12 @@ export const useLogin = () => {
             console.log('저장된 값:', {
                 session: localStorage.getItem('admin_session'),
                 adminId: localStorage.getItem('adminId'),
+                loginId: localStorage.getItem('loginId'),
                 pressCompany: localStorage.getItem('pressCompany')
             });
 
-            toast.success(`${pressCompany || adminId}님, 로그인했습니다`);
-
             console.log('페이지 이동 시작...');
-            // 즉시 리다이렉트
+            // 즉시 페이지 이동
             window.location.href = '/admin/issues';
         },
         onError: (error: any) => {
@@ -65,6 +71,7 @@ export const useLogout = () => {
             // 로컬 스토리지 정리
             localStorage.removeItem('admin_session');
             localStorage.removeItem('adminId');
+            localStorage.removeItem('loginId');
             localStorage.removeItem('pressCompany');
 
             toast.success(response?.message || '로그아웃되었습니다');
@@ -74,6 +81,7 @@ export const useLogout = () => {
             // 에러가 발생해도 로컬 정리
             localStorage.removeItem('admin_session');
             localStorage.removeItem('adminId');
+            localStorage.removeItem('loginId');
             localStorage.removeItem('pressCompany');
 
             toast.success('로그아웃되었습니다');
