@@ -6,30 +6,27 @@ const apiClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    withCredentials: true, // 쿠키 전송을 위해
 });
 
-// Request Interceptor - 세션 추가
+// Request Interceptor - JWT 추가
 apiClient.interceptors.request.use(
     (config) => {
-        const session = localStorage.getItem('admin_session');
-        if (session) {
-            config.headers['Authorization'] = `Bearer ${session}`;
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
     },
     (error) => Promise.reject(error)
 );
 
-// Response Interceptor - 에러 처리
+// Response Interceptor - 인증 에러 처리
 apiClient.interceptors.response.use(
     (response) => response.data,
     (error) => {
         if (error.response?.status === 401) {
             // 인증 실패 시 로그인 페이지로
-            localStorage.removeItem('admin_session');
-            localStorage.removeItem('adminId');
-            localStorage.removeItem('pressCompany');
+            localStorage.removeItem('accessToken');
             window.location.href = '/admin/login';
         }
         return Promise.reject(error);
