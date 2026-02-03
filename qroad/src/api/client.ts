@@ -20,10 +20,10 @@ apiClient.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Response Interceptor - 인증 에러 처리
+// Response Interceptor - 인증 에러 처리 + body만 반환
 apiClient.interceptors.response.use(
     (response) => {
-        return response; 
+        return response.data;
     },
     (error) => {
         if (error.response?.status === 401) {
