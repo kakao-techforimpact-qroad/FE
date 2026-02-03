@@ -55,8 +55,24 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 						<h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
 							{article.title}
 						</h1>
+
+						{/* Keywords Section */}
+						{article.keywords && article.keywords.length > 0 && (
+							<div className="flex flex-wrap gap-2">
+								{article.keywords.map((keyword, idx) => (
+									<span
+										key={idx}
+										className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border border-violet-200 hover:from-violet-200 hover:to-purple-200 transition-colors"
+									>
+										<span className="mr-1">#</span>
+										{keyword}
+									</span>
+								))}
+							</div>
+						)}
+
 						<div className="flex items-center gap-4 text-muted-foreground">
-							<span className="text-sm font-medium px-3 py-1.5 bg-purple-100 text-violet-700 rounded-full">
+							<span className="text-sm font-medium">
 								{article.publishedDate}
 							</span>
 							<span className="text-sm font-medium">{article.pressCompany}</span>
@@ -70,10 +86,10 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
 						<div className="relative space-y-5">
 							<div className="flex items-center gap-3">
-								<div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
+								<div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
 									<Sparkles className="w-5 h-5 text-white" />
 								</div>
-								<h2 className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+								<h2 className="text-1xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
 									AI 요약
 								</h2>
 							</div>

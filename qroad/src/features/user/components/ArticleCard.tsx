@@ -2,13 +2,11 @@ import { ArrowRight } from "lucide-react";
 
 interface ArticleCardProps {
   title: string;
-  description: string;
   onClick: () => void;
 }
 
 export function ArticleCard({
   title,
-  description,
   onClick,
 }: ArticleCardProps) {
   return (
@@ -24,9 +22,6 @@ export function ArticleCard({
           <h2 className="text-xl font-semibold text-foreground leading-tight group-hover:text-violet-600 transition-colors duration-300">
             {title}
           </h2>
-          <p className="text-base text-muted-foreground leading-relaxed">
-            {description}
-          </p>
         </div>
         <div className="flex-shrink-0 mt-1">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center group-hover:from-violet-600 group-hover:to-purple-600 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-purple-500/30 transition-all duration-300">

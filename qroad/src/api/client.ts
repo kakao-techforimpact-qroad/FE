@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
-    timeout: 10000, // 1시간 (3600초)
+    timeout: 300000, // 5분 (300초)
     headers: {
         'Content-Type': 'application/json',
     },

@@ -83,10 +83,12 @@ export const AdminLayout = () => {
             <div className="flex items-center gap-2 px-3 py-2 bg-purple-50 rounded-lg">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-violet-600 rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">
-                  {pressCompany?.charAt(0).toUpperCase() || 'A'}
+                  {(localStorage.getItem('loginId') || pressCompany || localStorage.getItem('adminId') || '관리자')?.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <span className="text-sm font-medium text-gray-900">{pressCompany || '관리자'}</span>
+              <span className="text-sm font-medium text-gray-900">
+                {localStorage.getItem('loginId') || pressCompany || localStorage.getItem('adminId') || '관리자'}
+              </span>
             </div>
             <Button
               onClick={handleLogout}
