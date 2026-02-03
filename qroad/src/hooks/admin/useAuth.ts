@@ -6,15 +6,22 @@ import { LoginRequest } from '@/types/admin';
 
 // 로그인 Hook
 export const useLogin = () => {
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
+
     return useMutation({
+        // authApi.login은 토큰 문자열을 반환함
         mutationFn: (data: LoginRequest) => authApi.login(data),
         onSuccess: (token: string) => {
-            // JWT 저장
-            localStorage.setItem('accessToken', token);
+            if (token && typeof token === 'string') {
+                // 1. JWT 저장
+                localStorage.setItem('accessToken', token);
 
-            toast.success('로그인되었습니다');
-            navigate('/admin/issues');
+                toast.success('로그인되었습니다');
+                navigate('/admin/issues');
+            } else {
+                console.error('토큰을 찾을 수 없습니다. 응답 값:', token);
+                toast.error('로그인 응답 형식이 올바르지 않습니다.');
+            }
         },
         onError: (error: any) => {
             toast.error(error.response?.data?.message || '로그인에 실패했습니다');
