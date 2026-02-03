@@ -6,8 +6,6 @@ import { LoginRequest } from '@/types/admin';
 
 // 로그인 Hook
 export const useLogin = () => {
-    const navigate = useNavigate();
-
     return useMutation({
         mutationFn: (data: LoginRequest) => authApi.login(data),
         onSuccess: (token: string) => {

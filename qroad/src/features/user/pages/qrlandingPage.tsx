@@ -5,7 +5,7 @@ import { useUserLandingPage } from '@/hooks/user/useLandingPage';
 
 interface ArticleListProps {
 	onArticleClick: (id: number) => void;
-	articles: Array<{ id: number; title: string; summary?: string; author?: string }>;
+	articles: Array<{ id: number; title: string }>;
 	isLoading?: boolean;
 }
 
@@ -60,17 +60,10 @@ export function ArticleList({ onArticleClick, articles, isLoading }: ArticleList
 			<main className="max-w-md mx-auto px-6 py-12 pb-32">
 				<div className="space-y-5">
 					{articles.map((article) => {
-						// summary를 100자로 제한
-						const summary = article.summary || article.title;
-						const truncatedSummary = summary.length > 100
-							? summary.slice(0, 100) + '...'
-							: summary;
-
 						return (
 							<ArticleCard
 								key={article.id}
 								title={article.title}
-								description={truncatedSummary}
 								onClick={() => onArticleClick(article.id)}
 							/>
 						);
@@ -129,8 +122,6 @@ export function QRLandingPage() {
 	const articles = (data?.articleSimpleDTOS || []).map(article => ({
 		id: article.id,
 		title: article.title,
-		summary: article.title, // API에 summary가 없으므로 title 사용
-		author: undefined,
 	}));
 
 	return <ArticleList onArticleClick={handleArticleClick} articles={articles} isLoading={isLoading} />;

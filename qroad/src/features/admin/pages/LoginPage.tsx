@@ -15,6 +15,7 @@ export const LoginPage = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         loginMutation.mutate({
             loginId: loginId,
             password: password,
