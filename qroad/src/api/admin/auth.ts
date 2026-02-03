@@ -6,6 +6,7 @@ import {
 export const authApi = {
     // 로그인
     login: async (data: LoginRequest): Promise<string> => {
-        return apiClient.post('/api/admin/login', data);
+        const response = await apiClient.post('/api/admin/login', data);
+        return response.data.accessToken;
     },
 };
