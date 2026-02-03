@@ -423,13 +423,8 @@ export const IssueEdit = () => {
                                                         size="lg"
                                                     >
                                                         <QrCode className="w-5 h-5 mr-2" />
-                                                        QR 생성 및 기사 발행하기
+                                                        QR 생성
                                                     </Button>
-                                                    <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                                                        <p className="text-sm text-amber-900">
-                                                            ⚠️ 이 버튼을 누르면 기사 상태가 <strong>'발행 완료'</strong>로 변경되고 QR 코드가 생성됩니다.
-                                                        </p>
-                                                    </div>
                                                 </CardContent>
                                             </Card>
                                         </motion.div>

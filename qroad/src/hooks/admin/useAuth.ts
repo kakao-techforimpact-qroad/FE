@@ -9,15 +9,19 @@ export const useLogin = () => {
     const navigate = useNavigate();
 
     return useMutation({
+        // authApi.login은 토큰 문자열을 반환함
         mutationFn: (data: LoginRequest) => authApi.login(data),
-        onSuccess: (response) => {
-            // 세션 정보 저장
-            localStorage.setItem('admin_session', response.session);
-            localStorage.setItem('adminId', response.adminId);
-            localStorage.setItem('pressCompany', response.pressCompany);
+        onSuccess: (token: string) => {
+            if (token && typeof token === 'string') {
+                // 1. JWT 저장
+                localStorage.setItem('accessToken', token);
 
-            toast.success(`${response.pressCompany}에 로그인했습니다`);
-            navigate('/admin/issues');
+                toast.success('로그인되었습니다');
+                navigate('/admin/issues');
+            } else {
+                console.error('토큰을 찾을 수 없습니다. 응답 값:', token);
+                toast.error('로그인 응답 형식이 올바르지 않습니다.');
+            }
         },
         onError: (error: any) => {
             toast.error(error.response?.data?.message || '로그인에 실패했습니다');
@@ -30,34 +34,23 @@ export const useLogout = () => {
     const navigate = useNavigate();
 
     return useMutation({
-        mutationFn: () => {
-            return authApi.logout();
+        mutationFn: async () => {
+            // 서버에 요청할 필요 없음
+            return Promise.resolve();
         },
-        onSuccess: (response) => {
-            // 로컬 스토리지 정리
-            localStorage.removeItem('admin_session');
-            localStorage.removeItem('adminId');
-            localStorage.removeItem('pressCompany');
-
-            toast.success(response.message);
+        onSuccess: () => {
+            localStorage.removeItem('accessToken');
+            toast.success('로그아웃되었습니다');
             navigate('/admin/login');
-        },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || '로그아웃에 실패했습니다');
         },
     });
 };
 
 // 로그인 상태 확인 Hook
 export const useAuthStatus = () => {
-    const session = localStorage.getItem('admin_session');
-    const adminId = localStorage.getItem('adminId');
-    const pressCompany = localStorage.getItem('pressCompany');
+    const token = localStorage.getItem('accessToken');
 
     return {
-        isAuthenticated: !!session && !!adminId,
-        adminId,
-        pressCompany,
-        session,
+        isAuthenticated: !!token,
     };
 };

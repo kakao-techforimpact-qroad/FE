@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Button } from '@/shared/components/ui/button';
@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/sha
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { Eye, Calendar, FileText, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { usePublications } from '@/hooks/admin/usePublications';
+import { toast } from 'sonner';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -13,6 +14,17 @@ export const IssueList = () => {
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const { data, isLoading, error } = usePublications({ page: currentPage, limit: ITEMS_PER_PAGE });
+
+    // 로그인 직후 환영 메시지 표시
+    useEffect(() => {
+        const justLoggedIn = localStorage.getItem('justLoggedIn');
+        const loginId = localStorage.getItem('loginId');
+
+        if (justLoggedIn === 'true') {
+            toast.success(`${loginId}님, 로그인했습니다`);
+            localStorage.removeItem('justLoggedIn'); // 플래그 제거
+        }
+    }, []);
 
     // Pagination
     const totalPages = data ? Math.ceil(data.total_count / ITEMS_PER_PAGE) : 0;
@@ -136,7 +148,11 @@ export const IssueList = () => {
                                             <TableCell className="text-center">
                                                 <div className="flex items-center justify-center gap-2">
                                                     <div className="w-2 h-2 rounded-full bg-purple-600" />
-                                                    <span className="font-semibold text-gray-900">{publication.title}</span>
+                                                    <span className="font-semibold text-gray-900">
+                                                        {publication.title.length > 10
+                                                            ? publication.title.slice(0, 10) + '...'
+                                                            : publication.title}
+                                                    </span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-left max-w-md">
@@ -206,7 +222,7 @@ export const IssueList = () => {
                                 {totalPages > 1 ? (
                                     getPageNumbers().map((page, index) => (
                                         page === '...' ? (
-                                            <span key={`ellipsis-${index}`} className="px-2 text-gray-400">...</span>
+                                            <span key={`ellipsis - ${index} `} className="px-2 text-gray-400">...</span>
                                         ) : (
                                             <Button
                                                 key={page}
