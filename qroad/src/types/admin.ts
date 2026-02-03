@@ -4,24 +4,6 @@ export interface LoginRequest {
     password: string;
 }
 
-export interface LoginResponse {
-    adminId: string;
-    pressCompany: string;
-    session: string;
-}
-
-// 로그아웃 관련 (Request Body 없음)
-export interface LogoutResponse {
-    message: string;
-}
-
-// 관리자 정보
-export interface AdminUser {
-    adminId: string;
-    pressCompany: string;
-    session: string;
-}
-
 // Publication (신문) 관련
 export interface ArticleInResponse {
     id: number;
