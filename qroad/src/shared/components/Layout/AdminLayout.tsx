@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/shared/components/ui/button';
 import { LogOut, History, PlusCircle, Menu, ChevronLeft } from 'lucide-react';
-import { useLogout, useAuthStatus } from '@/hooks/admin/useAuth';
+import { useLogout } from '@/hooks/admin/useAuth';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { getLoginIdFromToken } from '@/shared/utils/jwt';
 
 export const AdminLayout = () => {
   const logoutMutation = useLogout();
-  const { pressCompany } = useAuthStatus();
+  const token = localStorage.getItem('accessToken');
+  const loginId = token ? getLoginIdFromToken(token) : null;
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -83,10 +85,10 @@ export const AdminLayout = () => {
             <div className="flex items-center gap-2 px-3 py-2 bg-purple-50 rounded-lg">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-violet-600 rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">
-                  {pressCompany?.charAt(0).toUpperCase() || 'A'}
+                  {loginId?.charAt(0).toUpperCase() || 'A'}
                 </span>
               </div>
-              <span className="text-sm font-medium text-gray-900">{pressCompany || '관리자'}</span>
+              <span className="text-sm font-medium text-gray-900">{loginId || '관리자'}</span>
             </div>
             <Button
               onClick={handleLogout}
