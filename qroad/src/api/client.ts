@@ -22,10 +22,11 @@ apiClient.interceptors.request.use(
 
 // Response Interceptor - 인증 에러 처리
 apiClient.interceptors.response.use(
-    (response) => response.data,
+    (response) => {
+        return response; 
+    },
     (error) => {
         if (error.response?.status === 401) {
-            // 인증 실패 시 로그인 페이지로
             localStorage.removeItem('accessToken');
             window.location.href = '/admin/login';
         }
