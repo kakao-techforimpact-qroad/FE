@@ -34,4 +34,12 @@ apiClient.interceptors.response.use(
     }
 );
 
+/** 배포 빌드 등에서 인터셉터 미적용 시 axios 응답 전체가 올 수 있음. body만 추출 */
+export function unwrapResponse<T>(res: T | { data: T; status?: number }): T {
+    if (res != null && typeof res === 'object' && 'data' in res && 'status' in res) {
+        return (res as { data: T }).data;
+    }
+    return res as T;
+}
+
 export default apiClient;
