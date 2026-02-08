@@ -20,10 +20,18 @@ apiClient.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Response Interceptor - 인증 에러 처리
+// Response Interceptor - 인증 에러 처리 + body만 반환
 apiClient.interceptors.response.use(
     (response) => {
-        return response; 
+        const data = response.data;
+        if (typeof data === 'string') {
+            try {
+                return JSON.parse(data);
+            } catch {
+                return data;
+            }
+        }
+        return data;
     },
     (error) => {
         if (error.response?.status === 401) {
@@ -33,5 +41,13 @@ apiClient.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+/** 배포 빌드 등에서 인터셉터 미적용 시 axios 응답 전체가 올 수 있음. body만 추출 */
+export function unwrapResponse<T>(res: T | { data: T; status?: number }): T {
+    if (res != null && typeof res === 'object' && 'data' in res && 'status' in res) {
+        return (res as { data: T }).data;
+    }
+    return res as T;
+}
 
 export default apiClient;
