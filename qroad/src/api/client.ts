@@ -23,7 +23,15 @@ apiClient.interceptors.request.use(
 // Response Interceptor - 인증 에러 처리 + body만 반환
 apiClient.interceptors.response.use(
     (response) => {
-        return response.data;
+        const data = response.data;
+        if (typeof data === 'string') {
+            try {
+                return JSON.parse(data);
+            } catch {
+                return data;
+            }
+        }
+        return data;
     },
     (error) => {
         if (error.response?.status === 401) {
