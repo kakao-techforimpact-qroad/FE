@@ -16,12 +16,22 @@ export interface CreatePublicationRequest {
     title: string;
     content: string;
     publishedDate: string; // YYYY-MM-DD
+    filePath?: string | null;
 }
 
 export interface CreatePublicationResponse {
-    paperId: number;
-    articleCount: number;
-    articles: ArticleInResponse[];
+    jobId: string;
+}
+
+export type PublicationJobStatus = 'PROCESSING' | 'DONE' | 'FAILED';
+
+export interface PublicationProgressResponse {
+    status: PublicationJobStatus;
+    progress: number;
+    message: string;
+    // 완료 응답에서만 내려올 수 있어 optional로 둔다.
+    paperId?: number;
+    paper_id?: number;
 }
 
 // Publication 상세 조회 응답
