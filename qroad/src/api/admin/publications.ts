@@ -9,6 +9,7 @@ import {
 
 export const publicationsApi = {
     create: async (data: CreatePublicationRequest): Promise<CreatePublicationResponse> => {
+        // filePath가 null/undefined/빈 문자열이면 백엔드 not-null 제약 회피용 더미 경로를 사용한다.
         const normalizedFilePath =
             typeof data.filePath === 'string' && data.filePath.trim().length > 0
                 ? data.filePath

@@ -29,6 +29,7 @@ export interface PublicationProgressResponse {
     status: PublicationJobStatus;
     progress: number;
     message: string;
+    // 완료 응답에서만 내려올 수 있어 optional로 둔다.
     paperId?: number;
     paper_id?: number;
 }

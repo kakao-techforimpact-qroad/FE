@@ -34,6 +34,7 @@ export const IssueCreate = () => {
     const [error, setError] = useState<string | null>(null);
     const [startTime, setStartTime] = useState<number | null>(null);
 
+    // setInterval id를 보관해 중복 polling과 메모리 누수를 방지한다.
     const intervalRef = useRef<number | null>(null);
 
     const isLoading = createMutation.isPending || status === 'PROCESSING';
@@ -56,6 +57,7 @@ export const IssueCreate = () => {
     );
 
     const extractPaperId = (progressData: PublicationProgressResponse): number | null => {
+        // 백엔드 응답 스키마 차이(paperId / paper_id / result.paperId)를 모두 허용한다.
         const maybePaperId =
             progressData.paperId ??
             progressData.paper_id ??
@@ -75,6 +77,7 @@ export const IssueCreate = () => {
             return;
         }
 
+        // 새 작업 시작 전에 이전 polling 상태를 초기화한다.
         clearPolling();
         setError(null);
         setStatus('IDLE');
@@ -156,11 +159,13 @@ export const IssueCreate = () => {
                     return;
                 }
 
+                // 네트워크 오류는 polling을 유지하고 로그만 남긴다.
                 console.error('진행률 조회 중 네트워크 오류가 발생했습니다.', err);
             }
         };
 
         const runPolling = () => {
+            // 무한 polling을 막기 위해 10분을 초과하면 강제 종료한다.
             if (Date.now() - startTime >= POLLING_TIMEOUT_MS) {
                 stopWithFailure('작업 시간이 10분을 초과해 자동으로 중단되었습니다. 다시 시도해주세요.');
                 return;

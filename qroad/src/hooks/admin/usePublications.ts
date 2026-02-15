@@ -3,6 +3,7 @@ import { publicationsApi } from '@/api/admin/publications';
 import { toast } from 'sonner';
 import { CreatePublicationRequest } from '@/types/admin';
 
+// 신문 목록 조회 Hook
 export const usePublications = (params: { page?: number; limit?: number } = {}) => {
     return useQuery({
         queryKey: ['publications', params],
@@ -10,6 +11,7 @@ export const usePublications = (params: { page?: number; limit?: number } = {}) 
     });
 };
 
+// 신문 상세 조회 Hook
 export const usePublication = (paperId: number) => {
     return useQuery({
         queryKey: ['publication', paperId],
@@ -25,6 +27,7 @@ export const useCreatePublication = () => {
     return useMutation({
         mutationFn: (data: CreatePublicationRequest) => publicationsApi.create(data),
         onSuccess: () => {
+            // 생성 요청은 비동기 잡 시작만 담당하므로 목록 캐시만 갱신한다.
             queryClient.invalidateQueries({ queryKey: ['publications'] });
         },
         onError: (error: any) => {
@@ -34,6 +37,7 @@ export const useCreatePublication = () => {
     });
 };
 
+// Article 수정 Hook
 export const useUpdateArticle = (paperId: number) => {
     const queryClient = useQueryClient();
 
@@ -41,6 +45,7 @@ export const useUpdateArticle = (paperId: number) => {
         mutationFn: ({ articleId, data }: { articleId: number; data: { summary: string; keywords: string[] } }) =>
             publicationsApi.updateArticle(articleId, data),
         onSuccess: () => {
+            // Publication 상세 캐시 무효화
             queryClient.invalidateQueries({ queryKey: ['publication', paperId] });
             toast.success('Article을 수정했습니다');
         },
