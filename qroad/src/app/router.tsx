@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 // User Pages
 import { QRLandingPage } from '@/features/user/pages/qrlandingPage'
 import { ArticleDetailWrapper } from '@/features/user/pages/ArticleDetailPageWrapper'
+import { ReportPage } from '@/features/user/pages/ReportPage'
 
 // Admin Pages
 import { LoginPage } from '@/features/admin/pages/LoginPage'
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
   {
     path: '/article/:articleId',
     element: <ArticleDetailWrapper />,
+  },
+  {
+    path: '/report',
+    element: <ReportPage />,
   },
   // 관리자 페이지
   {
