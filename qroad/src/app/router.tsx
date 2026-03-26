@@ -10,6 +10,7 @@ import { LoginPage } from '@/features/admin/pages/LoginPage'
 import { IssueList } from '@/features/admin/pages/IssueList'
 import { IssueCreate } from '@/features/admin/pages/IssueCreate'
 import { IssueEdit } from '@/features/admin/pages/IssueEdit'
+import { ReportList } from '@/features/admin/pages/ReportList'
 import { ProtectedRoute } from '@/features/admin/components/ProtectedRoute'
 import { AdminLayout } from '@/shared/components/Layout/AdminLayout'
 
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
       {
         path: 'issues/:id',
         element: <IssueEdit />,
+      },
+      {
+        path: 'reports',
+        element: <ReportList />,
       },
     ],
   },

@@ -1,16 +1,11 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { ArrowLeft, Send, Sparkles } from 'lucide-react';
+import { ArrowLeft, UploadCloud, Info } from 'lucide-react';
 import { publicationsApi } from '@/api/admin/publications';
 import { useCreatePublication } from '@/hooks/admin/usePublications';
 import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { Input } from '@/shared/components/ui/input';
-import { Label } from '@/shared/components/ui/label';
 import { Progress } from '@/shared/components/ui/progress';
-import { Textarea } from '@/shared/components/ui/textarea';
 import { PublicationProgressResponse } from '@/types/admin';
 import { toast } from 'sonner';
 
@@ -26,6 +21,7 @@ export const IssueCreate = () => {
     const [issueNum, setIssueNum] = useState('');
     const [issueDate, setIssueDate] = useState('');
     const [rawText, setRawText] = useState('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const [jobId, setJobId] = useState<string | null>(null);
     const [progress, setProgress] = useState(0);
@@ -189,140 +185,155 @@ export const IssueCreate = () => {
     }, [clearPolling]);
 
     return (
-        <div className="p-8">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="max-w-4xl mx-auto"
-            >
-                <div className="mb-8">
-                    <Button
-                        onClick={() => navigate('/admin/issues')}
-                        variant="ghost"
-                        className="mb-4 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-                        disabled={isLoading}
-                    >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        기사 이력으로 돌아가기
-                    </Button>
-
-                    <h1 className="text-4xl bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-3">
-                        기사 발행
-                    </h1>
-                    <p className="text-gray-600">기사 원문을 입력한 뒤 발행 작업을 시작하세요.</p>
+        <div className="w-full min-h-full bg-[#F9FAFB] flex font-['Inter'] relative">
+            <div className="w-full p-[48px] overflow-x-auto">
+                {/* Header Section */}
+                <div 
+                    className="flex items-center gap-[8px] cursor-pointer w-fit mb-[16px]" 
+                    onClick={() => navigate('/admin/issues')}
+                >
+                    <ArrowLeft className="w-[12px] h-[14px] text-[#2563EB]" />
+                    <span className="font-normal text-[14px] leading-[20px] tracking-[-0.5px] text-[#2563EB]">
+                        이전으로 돌아가기
+                    </span>
                 </div>
+                <h1 className="font-normal text-[36px] leading-[40px] tracking-[-0.5px] text-[#2563EB] mb-[10px]">
+                    QR 발행
+                </h1>
+                <p className="font-normal text-[16px] leading-[24px] tracking-[-0.5px] text-[#4B5563] mb-[66px]">
+                    주간 신문에 대한 QR을 발행합니다. AI가 자동으로 내용을 분석하여 정보를 제공합니다.
+                </p>
 
-                <Card className="shadow-xl border border-purple-100 overflow-hidden p-0">
-                    <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100 p-5">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
-                                <Sparkles className="w-6 h-6 text-white" />
-                            </div>
-                            <div>
-                                <CardTitle className="text-2xl text-gray-900">기사 정보 입력</CardTitle>
-                                <CardDescription className="mt-1">필수 입력값을 모두 작성해주세요.</CardDescription>
-                            </div>
-                        </div>
-                    </CardHeader>
-
-                    <CardContent className="p-8">
-                        <form onSubmit={handleSubmit} className="space-y-8">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-3">
-                                    <Label htmlFor="issue_num" className="text-base">
-                                        이슈명/제목 <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        id="issue_num"
-                                        type="text"
-                                        value={issueNum}
-                                        onChange={(e) => setIssueNum(e.target.value)}
-                                        className="border-purple-200 focus:border-purple-400 focus:ring-purple-400 h-12 text-base"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="space-y-3">
-                                    <Label htmlFor="issue_date" className="text-base">
-                                        발행일자 <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        id="issue_date"
-                                        type="date"
-                                        value={issueDate}
-                                        onChange={(e) => setIssueDate(e.target.value)}
-                                        className="border-purple-200 focus:border-purple-400 focus:ring-purple-400 h-12 text-base"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-3">
-                                <Label htmlFor="raw_text" className="text-base">
-                                    기사 원문 <span className="text-red-500">*</span>
-                                </Label>
-                                <Textarea
-                                    id="raw_text"
-                                    value={rawText}
-                                    onChange={(e) => setRawText(e.target.value)}
-                                    className="border-purple-200 focus:border-purple-400 focus:ring-purple-400 min-h-[300px] text-base"
+                <form onSubmit={handleSubmit} className="flex flex-col gap-[24px]">
+                    
+                    {/* Info Input Box */}
+                    <div className="w-full max-w-[1304px] bg-[#FFFFFF] border border-[#E5E7EB] rounded-[8px] px-[33px] py-[35px]">
+                        <h3 className="font-normal text-[20px] leading-[28px] tracking-[-0.5px] text-[#111827] mb-[22px]">
+                            정보 입력
+                        </h3>
+                        
+                        <div className="grid grid-cols-2 gap-[24px] mb-[24px]">
+                            <div className="flex flex-col gap-[8px]">
+                                <label className="font-normal text-[14px] leading-[17px] tracking-[-0.5px] text-[#374151]">
+                                    호수/제목
+                                </label>
+                                <input 
+                                    type="text"
+                                    value={issueNum}
+                                    onChange={(e) => setIssueNum(e.target.value)}
+                                    placeholder="예: 제123호 - 지역 소식"
+                                    className="w-full h-[48px] bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] px-[16px] text-[#000000] placeholder-black/50 outline-none focus:border-[#2563EB]"
                                     required
                                 />
                             </div>
-
-                            {status !== 'IDLE' && (
-                                <div className="space-y-3 rounded-lg border border-purple-200 bg-purple-50 p-4">
-                                    <div className="flex items-center justify-between text-sm font-medium">
-                                        <span>진행률</span>
-                                        <span>{progress}%</span>
-                                    </div>
-                                    <Progress value={progress} />
-                                    <p className="text-sm text-gray-700">{message}</p>
-                                    {jobId && <p className="text-xs text-gray-500">Job ID: {jobId}</p>}
-                                    {status === 'FAILED' && error && <p className="text-sm text-red-600">{error}</p>}
-                                    {status === 'FAILED' && (
-                                        <Button type="button" variant="outline" onClick={startPublicationJob} className="w-fit">
-                                            재시도
-                                        </Button>
-                                    )}
-                                </div>
-                            )}
-
-                            <div className="flex gap-4 justify-end pt-6 border-t border-gray-200">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => navigate('/admin/issues')}
-                                    disabled={isLoading}
-                                    className="min-w-32 h-12"
-                                    size="lg"
-                                >
-                                    취소
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 min-w-40 h-12 shadow-lg shadow-purple-500/30"
-                                    disabled={isLoading}
-                                    size="lg"
-                                >
-                                    {isLoading ? (
-                                        <>
-                                            <Sparkles className="w-5 h-5 mr-2 animate-spin" />
-                                            AI 처리 중... {progress}%
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Send className="w-5 h-5 mr-2" />
-                                            기사 발행하기
-                                        </>
-                                    )}
-                                </Button>
+                            <div className="flex flex-col gap-[8px]">
+                                <label className="font-normal text-[14px] leading-[17px] tracking-[-0.5px] text-[#374151]">
+                                    발행일
+                                </label>
+                                <input 
+                                    type="date"
+                                    value={issueDate}
+                                    onChange={(e) => setIssueDate(e.target.value)}
+                                    className="w-full h-[48px] bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] px-[16px] text-[#000000] placeholder-black/50 outline-none focus:border-[#2563EB]"
+                                    required
+                                />
                             </div>
-                        </form>
-                    </CardContent>
-                </Card>
-            </motion.div>
+                        </div>
+
+                        <div className="flex flex-col gap-[8px]">
+                            <label className="font-normal text-[14px] leading-[17px] tracking-[-0.5px] text-[#374151]">
+                                기사 원문
+                            </label>
+                            <textarea 
+                                value={rawText}
+                                onChange={(e) => setRawText(e.target.value)}
+                                className="w-full min-h-[300px] bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] p-[16px] text-[#000000] placeholder-black/50 outline-none focus:border-[#2563EB] resize-y"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    {/* PDF Upload Box */}
+                    <div className="w-full max-w-[1304px] h-[420px] bg-[#FFFFFF] border border-[#E5E7EB] rounded-[8px] px-[33px] py-[33px] flex flex-col">
+                        <h3 className="font-normal text-[16px] leading-[24px] tracking-[-0.5px] text-[#111827]">
+                            지면 PDF 업로드
+                        </h3>
+                        <p className="font-normal text-[12px] leading-[16px] tracking-[-0.5px] text-[#6B7280] mb-[16px]">
+                            통합 PDF 한 장으로 AI가 분석합니다
+                        </p>
+
+                        <div className="w-full h-[282px] bg-[#F9FAFB] border-[2px] border-dashed border-[#D1D5DB] rounded-[8px] flex flex-col items-center justify-center relative">
+                            <input 
+                                type="file" 
+                                accept="application/pdf"
+                                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            />
+                            <UploadCloud className="w-[45px] h-[36px] text-[#9CA3AF] mb-[10px]" />
+                            <p className="font-normal text-[16px] leading-[24px] tracking-[-0.5px] text-[#374151]">
+                                {selectedFile ? selectedFile.name : '파일을 선택하거나 여기에 끌어다 놓으세요'}
+                            </p>
+                            <p className="font-normal text-[12px] leading-[16px] tracking-[-0.5px] text-[#6B7280] mt-[8px] mb-[32px]">
+                                한 개의 파일만 선택, 50MB 이하
+                            </p>
+                            <button type="button" className="pointer-events-none w-[138px] h-[46px] bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] font-normal text-[14px] leading-[17px] tracking-[-0.5px] text-[#374151]">
+                                파일 선택하기
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Status progress rendering */}
+                    {status !== 'IDLE' && (
+                        <div className="w-full max-w-[1304px] space-y-3 rounded-[8px] border border-[#DBEAFE] bg-[#EFF6FF] p-4 text-[#1E3A8A]">
+                            <div className="flex items-center justify-between text-sm font-medium">
+                                <span>진행률</span>
+                                <span>{progress}%</span>
+                            </div>
+                            <Progress value={progress} />
+                            <p className="text-sm">{message}</p>
+                            {jobId && <p className="text-xs opacity-70">Job ID: {jobId}</p>}
+                            {status === 'FAILED' && error && <p className="text-sm text-red-600">{error}</p>}
+                            {status === 'FAILED' && (
+                                <Button type="button" variant="outline" onClick={startPublicationJob} className="w-fit">
+                                    재시도
+                                </Button>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Warning Box */}
+                    <div className="w-full max-w-[1304px] h-[74px] bg-[#EFF6FF] border border-[#BFDBFE] rounded-[8px] p-[17px] flex items-center gap-[12px]">
+                        <Info className="w-[16px] h-[16px] text-[#2563EB] mb-auto mt-[4px]" />
+                        <div className="flex flex-col gap-[4px]">
+                            <p className="font-normal text-[14px] leading-[20px] tracking-[-0.5px] text-[#1E3A8A]">
+                                발행하기 클릭 후 AI 분석으로 인해 몇 분 정도 소요될 수 있습니다.
+                            </p>
+                            <p className="font-normal text-[12px] leading-[16px] tracking-[-0.5px] text-[#374151]">
+                                PDF는 한 파일만 업로드 가능하며, 한 파일 내에 모든 지면 내용이 포함되어야 합니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Submit / Cancel Buttons */}
+                    <div className="w-full max-w-[1304px] flex justify-end gap-[12px] mb-[48px]">
+                        <button 
+                            type="button" 
+                            onClick={() => navigate('/admin/issues')} 
+                            disabled={isLoading}
+                            className="w-[82px] h-[50px] bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] font-normal text-[16px] leading-[20px] tracking-[-0.5px] text-[#374151] flex items-center justify-center hover:bg-[#F9FAFB] transition-colors"
+                        >
+                            취소
+                        </button>
+                        <button 
+                            type="submit" 
+                            disabled={isLoading}
+                            className={`w-[136px] h-[50px] ${isLoading ? 'bg-[#9CA3AF]' : 'bg-[#2563EB] hover:bg-[#1D4ED8]'} text-[#FFFFFF] font-normal text-[16px] leading-[20px] tracking-[-0.5px] rounded-[8px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] flex items-center justify-center transition-colors`}
+                        >
+                            {isLoading ? `진행 중... ${progress}%` : '발행하기'}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };
