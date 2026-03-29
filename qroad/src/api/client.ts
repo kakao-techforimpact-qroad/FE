@@ -11,6 +11,15 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('accessToken');
+        const isAdminApi = config.url?.startsWith('/api/admin');
+
+        if (isAdminApi && !token) {
+            if (window.location.pathname !== '/admin/login') {
+                window.location.href = '/admin/login';
+            }
+            return Promise.reject(new axios.CanceledError('No access token'));
+        }
+
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
