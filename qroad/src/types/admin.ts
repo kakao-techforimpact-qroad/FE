@@ -96,3 +96,70 @@ export interface PublicationListResponse {
     total_count: number;
     papers: PublicationInList[];
 }
+
+// Report (이슈 제보) 관련
+export type ReportStatus = 'unconfirmed' | 'in_review' | 'completed';
+
+export interface ReportRelatedChunk {
+    chunk_id: number;
+    title: string;
+    link: string;
+}
+
+export interface Report {
+    report_id: number;
+    title: string;
+    content: string;
+    reporter_name: string;
+    reporter_region: string;
+    status: ReportStatus;
+    created_at: string;
+    related_chunks: ReportRelatedChunk[];
+}
+
+export interface ReportCountsByStatus {
+    all: number;
+    unconfirmed: number;
+    in_review: number;
+    completed: number;
+}
+
+export interface ReportListResponse {
+    total_count: number;
+    counts_by_status: ReportCountsByStatus;
+    reports: Report[];
+}
+
+export interface GetReportsParams {
+    page?: number;
+    limit?: number;
+    status?: ReportStatus;
+}
+
+export interface CreateReportRequest {
+    title: string;
+    content: string;
+    reporterContact: string;
+}
+
+export interface CreateReportResponse {
+    id: number;
+    title: string;
+    content: string;
+    reporterContact: string;
+    status: string;
+    createdAt: string;
+}
+
+export type EmotionType = 'LIKE' | 'HEARTWARMING' | 'SAD' | 'ANGRY' | 'WANT_FOLLOW_UP';
+
+export interface CreateEmotionRequest {
+    emotionType: EmotionType;
+}
+
+export interface CreateEmotionResponse {
+    articleId: number;
+    emotionType: EmotionType;
+    isActive: boolean;
+    totalCount: number;
+}
