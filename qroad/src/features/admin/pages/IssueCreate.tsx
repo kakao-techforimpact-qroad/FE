@@ -20,7 +20,6 @@ export const IssueCreate = () => {
 
     const [issueNum, setIssueNum] = useState('');
     const [issueDate, setIssueDate] = useState('');
-    const [rawText, setRawText] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const [jobId, setJobId] = useState<string | null>(null);
@@ -73,7 +72,16 @@ export const IssueCreate = () => {
             return;
         }
 
-        // 새 작업 시작 전에 이전 polling 상태를 초기화한다.
+        if (!selectedFile) {
+            toast.error('PDF 파일을 선택해주세요.');
+            return;
+        }
+
+        if (selectedFile.type && selectedFile.type !== 'application/pdf') {
+            toast.error('PDF 파일만 업로드할 수 있습니다.');
+            return;
+        }
+
         clearPolling();
         setError(null);
         setStatus('IDLE');
@@ -82,10 +90,21 @@ export const IssueCreate = () => {
         setJobId(null);
 
         try {
+            setMessage('PDF 업로드 URL을 요청 중입니다...');
+            const { uploadUrl, tempKey } = await publicationsApi.requestUploadUrl({
+                fileName: selectedFile.name,
+                contentType: selectedFile.type || 'application/pdf',
+                fileSize: selectedFile.size,
+            });
+
+            setMessage('PDF를 업로드하고 있습니다...');
+            await publicationsApi.uploadPdfToS3(uploadUrl, selectedFile);
+
+            setMessage('발행 작업 시작 요청 중입니다...');
             const response = await createMutation.mutateAsync({
                 title: issueNum,
-                content: rawText,
                 publishedDate: issueDate,
+                tempKey,
             });
 
             setJobId(response.jobId);
@@ -101,7 +120,7 @@ export const IssueCreate = () => {
             setError(errorMessage);
             setMessage(errorMessage);
         }
-    }, [clearPolling, createMutation, issueDate, issueNum, rawText, status]);
+    }, [clearPolling, createMutation, issueDate, issueNum, selectedFile, status]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -150,7 +169,7 @@ export const IssueCreate = () => {
                 navigate(`/admin/issues/${paperId}`);
             } catch (err: unknown) {
                 if (axios.isAxiosError(err) && err.response?.status === 404) {
-                    const notFoundMessage = '작업이 만료되었거나 존재하지 않습니다';
+                    const notFoundMessage = '작업이 만료되었거나 존재하지 않습니다.';
                     stopWithFailure(notFoundMessage);
                     return;
                 }
@@ -163,7 +182,7 @@ export const IssueCreate = () => {
         const runPolling = () => {
             // 무한 polling을 막기 위해 10분을 초과하면 강제 종료한다.
             if (Date.now() - startTime >= POLLING_TIMEOUT_MS) {
-                stopWithFailure('작업 시간이 10분을 초과해 자동으로 중단되었습니다. 다시 시도해주세요.');
+                stopWithFailure('작업 시간이 10분을 초과하여 자동으로 중단되었습니다. 다시 시도해주세요.');
                 return;
             }
 
@@ -221,7 +240,7 @@ export const IssueCreate = () => {
                                     type="text"
                                     value={issueNum}
                                     onChange={(e) => setIssueNum(e.target.value)}
-                                    placeholder="예: 제123호 - 지역 소식"
+                                    placeholder="예: 제23호 - 지역 소식"
                                     className="w-full h-[48px] bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] px-[16px] text-[#000000] placeholder-black/50 outline-none focus:border-[#2563EB]"
                                     required
                                 />
@@ -240,17 +259,6 @@ export const IssueCreate = () => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-[8px]">
-                            <label className="font-normal text-[14px] leading-[17px] tracking-[-0.5px] text-[#374151]">
-                                기사 원문
-                            </label>
-                            <textarea 
-                                value={rawText}
-                                onChange={(e) => setRawText(e.target.value)}
-                                className="w-full min-h-[300px] bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] p-[16px] text-[#000000] placeholder-black/50 outline-none focus:border-[#2563EB] resize-y"
-                                required
-                            />
-                        </div>
                     </div>
 
                     {/* PDF Upload Box */}
@@ -259,7 +267,7 @@ export const IssueCreate = () => {
                             지면 PDF 업로드
                         </h3>
                         <p className="font-normal text-[12px] leading-[16px] tracking-[-0.5px] text-[#6B7280] mb-[16px]">
-                            통합 PDF 한 장으로 AI가 분석합니다
+                            통합 PDF 파일로 AI가 분석합니다.
                         </p>
 
                         <div className="w-full h-[282px] bg-[#F9FAFB] border-[2px] border-dashed border-[#D1D5DB] rounded-[8px] flex flex-col items-center justify-center relative">
@@ -295,7 +303,7 @@ export const IssueCreate = () => {
                             {status === 'FAILED' && error && <p className="text-sm text-red-600">{error}</p>}
                             {status === 'FAILED' && (
                                 <Button type="button" variant="outline" onClick={startPublicationJob} className="w-fit">
-                                    재시도
+                                    다시 시도
                                 </Button>
                             )}
                         </div>
@@ -337,4 +345,5 @@ export const IssueCreate = () => {
         </div>
     );
 };
+
 

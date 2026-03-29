@@ -14,13 +14,23 @@ export interface ArticleInResponse {
 
 export interface CreatePublicationRequest {
     title: string;
-    content: string;
     publishedDate: string; // YYYY-MM-DD
-    filePath?: string | null;
+    tempKey: string;
 }
 
 export interface CreatePublicationResponse {
     jobId: string;
+}
+
+export interface PublicationUploadUrlRequest {
+    fileName: string;
+    contentType: string;
+    fileSize: number;
+}
+
+export interface PublicationUploadUrlResponse {
+    uploadUrl: string;
+    tempKey: string;
 }
 
 export type PublicationJobStatus = 'PROCESSING' | 'DONE' | 'FAILED';
