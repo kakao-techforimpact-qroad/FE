@@ -12,8 +12,9 @@ apiClient.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('accessToken');
         const isAdminApi = config.url?.startsWith('/api/admin');
+        const isAdminLoginApi = config.url?.startsWith('/api/admin/login');
 
-        if (isAdminApi && !token) {
+        if (isAdminApi && !isAdminLoginApi && !token) {
             if (window.location.pathname !== '/admin/login') {
                 window.location.href = '/admin/login';
             }
