@@ -91,6 +91,7 @@ export interface ArticleDetailResponse {
     publishedDate: string;
     summary: string;
     keywords: string[];
+    myEmotion: EmotionType | null;
     articleRelatedDTOS: RelatedArticle[];
     policyArticleRelatedDTOS: RelatedPolicy[];
 }
@@ -107,6 +108,13 @@ export interface PublicationInList {
 export interface PublicationListResponse {
     total_count: number;
     papers: PublicationInList[];
+}
+
+export interface GetPublicationsParams {
+    page?: number;
+    limit?: number;
+    month?: string; // YYYY-MM
+    q?: string; // issue number or title keyword
 }
 
 // Report (이슈 제보) 관련

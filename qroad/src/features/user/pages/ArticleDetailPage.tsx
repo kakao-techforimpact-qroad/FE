@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
   ArrowLeft, Sparkles, Check, Building, User, ImageOff,
   Landmark, Home, Coins, ThumbsUp, Heart, Frown, Angry, MessageSquareWarning 
@@ -14,22 +14,32 @@ interface ArticleDetailProps {
 
 type EmotionState = Record<EmotionType, { isActive: boolean; count: number }>;
 
+const createEmotionState = (myEmotion: EmotionType | null): EmotionState => ({
+	LIKE: { isActive: myEmotion === "LIKE", count: 0 },
+	HEARTWARMING: { isActive: myEmotion === "HEARTWARMING", count: 0 },
+	SAD: { isActive: myEmotion === "SAD", count: 0 },
+	ANGRY: { isActive: myEmotion === "ANGRY", count: 0 },
+	WANT_FOLLOW_UP: { isActive: myEmotion === "WANT_FOLLOW_UP", count: 0 },
+});
+
 export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
-	const [emotions, setEmotions] = useState<EmotionState>({
-		LIKE: { isActive: false, count: 0 },
-		HEARTWARMING: { isActive: false, count: 0 },
-		SAD: { isActive: false, count: 0 },
-		ANGRY: { isActive: false, count: 0 },
-		WANT_FOLLOW_UP: { isActive: false, count: 0 },
-	});
+	const [emotions, setEmotions] = useState<EmotionState>(() => createEmotionState(article.myEmotion ?? null));
+
+	useEffect(() => {
+		setEmotions(createEmotionState(article.myEmotion ?? null));
+	}, [article.myEmotion]);
 
 	const handleEmotionToggle = async (type: EmotionType) => {
 		try {
 			const res = await userApi.toggleEmotion(article.articleId, { emotionType: type });
-			setEmotions(prev => ({
-				...prev,
-				[type]: { isActive: res.isActive, count: res.totalCount }
-			}));
+			setEmotions((prev) => {
+				const next = { ...prev };
+				(Object.keys(next) as EmotionType[]).forEach((key) => {
+					next[key] = { ...next[key], isActive: false };
+				});
+				next[type] = { ...next[type], isActive: res.isActive, count: res.totalCount };
+				return next;
+			});
 		} catch (error) {
 			console.error("Failed to toggle emotion:", error);
 			alert("감정 표현을 반영하지 못했습니다.");

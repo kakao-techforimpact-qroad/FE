@@ -8,7 +8,7 @@ export const userApi = {
     },
 
     getArticleDetail: async (articleId: number): Promise<ArticleDetailResponse> => {
-        const res = await apiClient.get(`/api/articles/${articleId}`);
+        const res = await apiClient.get(`/api/articles/${articleId}`, { withCredentials: true });
         return unwrapResponse(res) as ArticleDetailResponse;
     },
 
@@ -18,7 +18,7 @@ export const userApi = {
     },
 
     toggleEmotion: async (articleId: number, payload: CreateEmotionRequest): Promise<CreateEmotionResponse> => {
-        const res = await apiClient.post(`/api/articles/${articleId}/emotions`, payload);
+        const res = await apiClient.post(`/api/articles/${articleId}/emotions`, payload, { withCredentials: true });
         return unwrapResponse(res) as CreateEmotionResponse;
     },
 };

@@ -10,7 +10,6 @@ const ITEMS_PER_PAGE = 10;
 const categories = ['경제', '문화', '교통', '안전', '행사'];
 const getCategory = (id: number) => categories[id % categories.length];
 const getViews = (id: number) => (id * 123 + 456).toLocaleString();
-const getStatus = (id: number) => id % 3 === 0 ? '수정중' : '발행완료';
 const formatIssueNumber = (dateString: string) => {
     if (!dateString) return '2024-01';
     return dateString.substring(0, 7); // Extracts "2024-01" from "2024-01-15"
@@ -19,11 +18,23 @@ const formatPublishedDate = (dateString: string) => {
     if (!dateString) return '2024.01.15';
     return dateString.split('-').join('.');
 };
-
 export const IssueList = () => {
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
-    const { data, isLoading, error } = usePublications({ page: currentPage, limit: ITEMS_PER_PAGE });
+    const [selectedMonth, setSelectedMonth] = useState('');
+    const [searchInput, setSearchInput] = useState('');
+    const [searchKeyword, setSearchKeyword] = useState('');
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedMonth, searchKeyword]);
+
+    const { data, isLoading, error } = usePublications({
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+        month: selectedMonth || undefined,
+        q: searchKeyword || undefined,
+    });
 
     // 로그인 직후 환영 메시지 표시
     useEffect(() => {
@@ -100,33 +111,35 @@ export const IssueList = () => {
             <div className="mt-[54px] w-full flex items-center justify-between">
                 <div className="flex gap-[16px]">
                     <div className="relative">
-                        <select className="w-[141px] h-[37px] appearance-none bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] pl-3 pr-8 font-normal text-[14px] leading-[17px] tracking-[-0.5px] text-[#000000] outline-none">
-                            <option>전체 호수</option>
-                        </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M1 1L5 5L9 1" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        </div>
+                        <input
+                            type="month"
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                            className="w-[160px] h-[37px] bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] px-3 font-normal text-[14px] leading-[17px] tracking-[-0.5px] text-[#000000] outline-none"
+                        />
                     </div>
-                    
-                    <div className="relative">
-                        <select className="w-[106px] h-[37px] appearance-none bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] pl-3 pr-8 font-normal text-[14px] leading-[17px] tracking-[-0.5px] text-[#000000] outline-none">
-                            <option>전체 상태</option>
-                        </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M1 1L5 5L9 1" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        </div>
-                    </div>
+                    {selectedMonth && (
+                        <button
+                            type="button"
+                            onClick={() => setSelectedMonth('')}
+                            className="h-[37px] px-3 bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] font-normal text-[14px] text-[#374151]"
+                        >
+                            전체
+                        </button>
+                    )}
                 </div>
 
                 <div className="relative">
                     <input 
                         type="text" 
-                        placeholder="기사 제목 검색..." 
-                        className="w-[256px] h-[38px] bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] pl-10 pr-4 font-normal text-[14px] leading-[20px] tracking-[-0.5px] placeholder:text-[rgba(0,0,0,0.5)] outline-none focus:border-[#3B82F6]"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
+                            setSearchKeyword(searchInput.trim());
+                        }}
+                        placeholder="호수(예: 2026-03) 또는 기사 제목 검색..." 
+                        className="w-[360px] h-[38px] bg-[#FFFFFF] border border-[#D1D5DB] rounded-[8px] pl-10 pr-4 font-normal text-[14px] leading-[20px] tracking-[-0.5px] placeholder:text-[rgba(0,0,0,0.5)] outline-none focus:border-[#3B82F6]"
                     />
                     <Search className="absolute left-[12px] top-[11px] w-4 h-4 text-[#9CA3AF]" />
                 </div>
@@ -142,14 +155,12 @@ export const IssueList = () => {
                             <th className="w-[156px] h-[48.5px] font-medium text-[12px] leading-[15px] tracking-[0.1px] text-[#6B7280] text-center font-['Inter']">카테고리</th>
                             <th className="w-[191px] h-[48.5px] font-medium text-[12px] leading-[15px] tracking-[0.1px] text-[#6B7280] text-center font-['Inter']">발행일</th>
                             <th className="w-[136px] h-[48.5px] font-medium text-[12px] leading-[15px] tracking-[0.1px] text-[#6B7280] text-center font-['Inter']">조회수</th>
-                            <th className="w-[177px] h-[48.5px] font-medium text-[12px] leading-[15px] tracking-[0.1px] text-[#6B7280] text-center font-['Inter']">상태</th>
                             <th className="w-[215px] h-[48.5px] font-medium text-[12px] leading-[15px] tracking-[0.1px] text-[#6B7280] text-center font-['Inter']">관리</th>
                         </tr>
                     </thead>
                     <tbody className="bg-[#FFFFFF]">
                         {publications.length > 0 ? (
                             publications.map((pub, idx) => {
-                                const status = getStatus(pub.id);
                                 return (
                                     <tr 
                                         key={pub.id} 
@@ -172,13 +183,6 @@ export const IssueList = () => {
                                             {getViews(pub.id)}
                                         </td>
                                         <td className="text-center">
-                                            <span className={`inline-flex items-center justify-center px-[10px] h-[24px] rounded-full font-semibold text-[12px] leading-[15px] tracking-[-0.5px] ${
-                                                status === '발행완료' ? 'bg-[#DCFCE7] text-[#166534]' : 'bg-[#FEF9C3] text-[#854D0E]'
-                                            }`}>
-                                                {status}
-                                            </span>
-                                        </td>
-                                        <td className="text-center">
                                             <button 
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -194,7 +198,7 @@ export const IssueList = () => {
                             })
                         ) : (
                             <tr>
-                                <td colSpan={7} className="text-center py-10 font-normal text-[14px] text-[#6B7280]">
+                                <td colSpan={6} className="text-center py-10 font-normal text-[14px] text-[#6B7280]">
                                     표시할 기사가 없습니다.
                                 </td>
                             </tr>

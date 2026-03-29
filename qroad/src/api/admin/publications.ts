@@ -2,6 +2,7 @@ import apiClient, { unwrapResponse } from '../client';
 import {
     CreatePublicationRequest,
     CreatePublicationResponse,
+    GetPublicationsParams,
     PublicationDetailResponse,
     PublicationListResponse,
     PublicationProgressResponse,
@@ -57,9 +58,16 @@ export const publicationsApi = {
         return unwrapResponse(res) as PublicationProgressResponse;
     },
 
-    getAll: async (params: { page?: number; limit?: number } = {}): Promise<PublicationListResponse> => {
-        const { page = 1, limit = 10 } = params;
-        const res = await apiClient.get('/api/admin/publications', { params: { page, limit } });
+    getAll: async (params: GetPublicationsParams = {}): Promise<PublicationListResponse> => {
+        const { page = 1, limit = 10, month, q } = params;
+        const res = await apiClient.get('/api/admin/publications', {
+            params: {
+                page,
+                limit,
+                ...(month ? { month } : {}),
+                ...(q ? { q } : {}),
+            },
+        });
         const body = unwrapResponse(res) as PublicationListResponse | undefined;
         return body ?? { total_count: 0, papers: [] };
     },

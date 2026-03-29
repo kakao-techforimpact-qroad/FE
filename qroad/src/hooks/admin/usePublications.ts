@@ -1,10 +1,10 @@
 ﻿import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { publicationsApi } from '@/api/admin/publications';
 import { toast } from 'sonner';
-import { CreatePublicationRequest } from '@/types/admin';
+import { CreatePublicationRequest, GetPublicationsParams } from '@/types/admin';
 
 // 신문 목록 조회 Hook
-export const usePublications = (params: { page?: number; limit?: number } = {}) => {
+export const usePublications = (params: GetPublicationsParams = {}) => {
     return useQuery({
         queryKey: ['publications', params],
         queryFn: () => publicationsApi.getAll(params),
