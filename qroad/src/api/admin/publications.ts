@@ -5,23 +5,51 @@ import {
     PublicationDetailResponse,
     PublicationListResponse,
     PublicationProgressResponse,
+    PublicationUploadUrlRequest,
+    PublicationUploadUrlResponse,
 } from '@/types/admin';
 
 export const publicationsApi = {
     create: async (data: CreatePublicationRequest): Promise<CreatePublicationResponse> => {
-        // filePath가 null/undefined/빈 문자열이면 백엔드 not-null 제약 회피용 더미 경로를 사용한다.
-        const normalizedFilePath =
-            typeof data.filePath === 'string' && data.filePath.trim().length > 0
-                ? data.filePath
-                : 'temp/manual-upload.txt';
-
         const res = await apiClient.post('/api/admin/publications', {
             title: data.title,
-            content: data.content,
             publishedDate: data.publishedDate,
-            filePath: normalizedFilePath,
+            tempKey: data.tempKey,
         });
         return unwrapResponse(res) as CreatePublicationResponse;
+    },
+
+    requestUploadUrl: async (
+        data: PublicationUploadUrlRequest
+    ): Promise<PublicationUploadUrlResponse> => {
+        const res = await apiClient.post('/api/admin/publications/upload-url', data);
+        const body = unwrapResponse(res) as Record<string, unknown>;
+
+        const uploadUrl =
+            (body.uploadUrl as string | undefined) ??
+            (body.presignedUrl as string | undefined) ??
+            (body.url as string | undefined);
+        const tempKey = (body.tempKey as string | undefined) ?? (body.key as string | undefined);
+
+        if (!uploadUrl || !tempKey) {
+            throw new Error('업로드 URL 발급 응답 형식이 올바르지 않습니다.');
+        }
+
+        return { uploadUrl, tempKey };
+    },
+
+    uploadPdfToS3: async (uploadUrl: string, file: File): Promise<void> => {
+        const res = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': file.type || 'application/pdf',
+            },
+            body: file,
+        });
+
+        if (!res.ok) {
+            throw new Error(`PDF 업로드에 실패했습니다. (${res.status})`);
+        }
     },
 
     getProgress: async (jobId: string): Promise<PublicationProgressResponse> => {
@@ -51,3 +79,4 @@ export const publicationsApi = {
         return unwrapResponse(res);
     },
 };
+

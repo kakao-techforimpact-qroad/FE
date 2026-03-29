@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { 
-  ArrowLeft, Share2, MoreVertical, Sparkles, Check, Building, User,
+  ArrowLeft, Sparkles, Check, Building, User, ImageOff,
   Landmark, Home, Coins, ThumbsUp, Heart, Frown, Angry, MessageSquareWarning 
 } from "lucide-react";
 import { ArticleDetailResponse, EmotionType } from '@/types/admin';
 import { userApi } from '@/api/user';
+import { toRenderableImageUrl } from '@/shared/utils/image';
 
 interface ArticleDetailProps {
 	article: ArticleDetailResponse;
@@ -52,14 +53,7 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 					<button onClick={onBack} className="w-10 h-10 flex items-center justify-center -ml-2">
 						<ArrowLeft className="w-6 h-6 text-[#374151]" />
 					</button>
-					<div className="flex items-center">
-						<button className="w-10 h-10 flex items-center justify-center">
-							<Share2 className="w-5 h-5 text-[#374151]" />
-						</button>
-						<button className="w-8 h-10 flex items-center justify-center -mr-2">
-							<MoreVertical className="w-5 h-5 text-[#374151]" />
-						</button>
-					</div>
+					<div className="w-10 h-10" />
 				</header>
 
 				<main className="w-full">
@@ -101,7 +95,7 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 							</p>
 							
 							{/* Key Points - If no structured AI points, mock them based on user provided data */}
-							<div className="flex flex-col gap-2">
+							<div className="hidden">
 								<h3 className="text-[14px] font-normal text-[#111827] tracking-[-0.5px] mb-1">핵심 내용</h3>
 								<div className="flex items-start gap-2">
 									<Check className="w-3 h-3 text-[#2563EB] mt-1 shrink-0" strokeWidth={3} />
@@ -217,7 +211,19 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 							<div className="flex flex-col gap-3">
 								{article.articleRelatedDTOS.map((related) => (
 									<div key={related.id} onClick={() => window.open(related.link, '_blank')} className="w-full p-[13px] bg-white border border-[#E5E7EB] rounded-[12px] flex gap-[12px] cursor-pointer active:scale-[0.98] transition-transform">
-										<div className="w-[80px] h-[80px] rounded-[8px] bg-[#E5E7EB] shrink-0 overflow-hidden relative" />
+										{toRenderableImageUrl(related.imagePath) ? (
+											<img
+												src={toRenderableImageUrl(related.imagePath)!}
+												alt={related.title}
+												className="w-[80px] h-[80px] rounded-[8px] object-cover shrink-0"
+												loading="lazy"
+											/>
+										) : (
+											<div className="w-[80px] h-[80px] rounded-[8px] bg-[#F3F4F6] shrink-0 overflow-hidden flex flex-col items-center justify-center text-[#9CA3AF]">
+												<ImageOff className="w-4 h-4 mb-1" />
+												<span className="text-[10px] tracking-[-0.5px]">이미지 없음</span>
+											</div>
+										)}
 										<div className="flex flex-col justify-center flex-1">
 											<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-2">
 												{related.title}
