@@ -58,6 +58,7 @@ export interface PublicationDetailResponse {
 export interface ArticleSimple {
     id: number;
     title: string;
+    imagePath?: string;
 }
 
 export interface UserLandingPageResponse {
@@ -72,6 +73,7 @@ export interface RelatedArticle {
     title: string;
     content: string;
     link: string;
+    imagePath?: string;
 }
 
 export interface RelatedPolicy {
