@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { 
-  ArrowLeft, Share2, MoreVertical, Sparkles, Check, Building, User,
+  ArrowLeft, Sparkles, Check, Building, User,
   Landmark, Home, Coins, ThumbsUp, Heart, Frown, Angry, MessageSquareWarning 
 } from "lucide-react";
 import { ArticleDetailResponse, EmotionType } from '@/types/admin';
@@ -52,14 +52,7 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 					<button onClick={onBack} className="w-10 h-10 flex items-center justify-center -ml-2">
 						<ArrowLeft className="w-6 h-6 text-[#374151]" />
 					</button>
-					<div className="flex items-center">
-						<button className="w-10 h-10 flex items-center justify-center">
-							<Share2 className="w-5 h-5 text-[#374151]" />
-						</button>
-						<button className="w-8 h-10 flex items-center justify-center -mr-2">
-							<MoreVertical className="w-5 h-5 text-[#374151]" />
-						</button>
-					</div>
+					<div className="w-10 h-10" />
 				</header>
 
 				<main className="w-full">
@@ -101,7 +94,7 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 							</p>
 							
 							{/* Key Points - If no structured AI points, mock them based on user provided data */}
-							<div className="flex flex-col gap-2">
+							<div className="hidden">
 								<h3 className="text-[14px] font-normal text-[#111827] tracking-[-0.5px] mb-1">핵심 내용</h3>
 								<div className="flex items-start gap-2">
 									<Check className="w-3 h-3 text-[#2563EB] mt-1 shrink-0" strokeWidth={3} />
