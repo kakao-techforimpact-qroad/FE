@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
   ArrowLeft, Sparkles, Check, Building, User, ImageOff,
   Landmark, Home, Coins, ThumbsUp, Heart, Frown, Angry, MessageSquareWarning 
@@ -14,22 +14,51 @@ interface ArticleDetailProps {
 
 type EmotionState = Record<EmotionType, { isActive: boolean; count: number }>;
 
+const createEmotionState = (myEmotion: EmotionType | null): EmotionState => ({
+	LIKE: { isActive: myEmotion === "LIKE", count: 0 },
+	HEARTWARMING: { isActive: myEmotion === "HEARTWARMING", count: 0 },
+	SAD: { isActive: myEmotion === "SAD", count: 0 },
+	ANGRY: { isActive: myEmotion === "ANGRY", count: 0 },
+	WANT_FOLLOW_UP: { isActive: myEmotion === "WANT_FOLLOW_UP", count: 0 },
+});
+
+const formatRelativeTime = (publishedDate: string) => {
+	const published = new Date(publishedDate);
+	if (Number.isNaN(published.getTime())) return "";
+
+	const diffMs = Date.now() - published.getTime();
+	if (diffMs <= 0) return "방금 전";
+
+	const minute = 60 * 1000;
+	const hour = 60 * minute;
+	const day = 24 * hour;
+
+	if (diffMs < hour) return `${Math.max(1, Math.floor(diffMs / minute))}분 전`;
+	if (diffMs < day) return `${Math.floor(diffMs / hour)}시간 전`;
+	if (diffMs < day * 7) return `${Math.floor(diffMs / day)}일 전`;
+
+	return publishedDate.slice(0, 10).replace(/-/g, ".");
+};
+
 export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
-	const [emotions, setEmotions] = useState<EmotionState>({
-		LIKE: { isActive: false, count: 0 },
-		HEARTWARMING: { isActive: false, count: 0 },
-		SAD: { isActive: false, count: 0 },
-		ANGRY: { isActive: false, count: 0 },
-		WANT_FOLLOW_UP: { isActive: false, count: 0 },
-	});
+	const [emotions, setEmotions] = useState<EmotionState>(() => createEmotionState(article.myEmotion ?? null));
+	const relativePublishedTime = formatRelativeTime(article.publishedDate);
+
+	useEffect(() => {
+		setEmotions(createEmotionState(article.myEmotion ?? null));
+	}, [article.myEmotion]);
 
 	const handleEmotionToggle = async (type: EmotionType) => {
 		try {
 			const res = await userApi.toggleEmotion(article.articleId, { emotionType: type });
-			setEmotions(prev => ({
-				...prev,
-				[type]: { isActive: res.isActive, count: res.totalCount }
-			}));
+			setEmotions((prev) => {
+				const next = { ...prev };
+				(Object.keys(next) as EmotionType[]).forEach((key) => {
+					next[key] = { ...next[key], isActive: false };
+				});
+				next[type] = { ...next[type], isActive: res.isActive, count: res.totalCount };
+				return next;
+			});
 		} catch (error) {
 			console.error("Failed to toggle emotion:", error);
 			alert("감정 표현을 반영하지 못했습니다.");
@@ -61,7 +90,11 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 					<section className="w-full px-4 pt-5 pb-8">
 						<div className="flex items-center gap-2 mb-3">
 							<span className="text-[12px] font-normal text-[#2563EB] tracking-[-0.5px]">지역소식</span>
-							<span className="text-[12px] font-normal text-[#9CA3AF] tracking-[-0.5px]">5분 전</span>
+							{relativePublishedTime && (
+								<span className="text-[12px] font-normal text-[#9CA3AF] tracking-[-0.5px]">
+									{relativePublishedTime}
+								</span>
+							)}
 						</div>
 						
 						<h1 className="text-[24px] font-normal text-[#111827] leading-[30px] tracking-[-0.5px] mb-5">
