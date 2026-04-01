@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { 
   ArrowLeft, Sparkles, Check, Building, User, ImageOff,
-  Landmark, Home, Coins, ThumbsUp, Heart, Frown, Angry, MessageSquareWarning 
+  Landmark, Home, Coins, ThumbsUp, Heart, Frown, Angry, MessageSquareWarning, Loader2
 } from "lucide-react";
-import { ArticleDetailResponse, EmotionType } from '@/types/admin';
+import { ArticleDetailResponse, EmotionType, EmotionCounts } from '@/types/admin';
 import { userApi } from '@/api/user';
 import { toRenderableImageUrl } from '@/shared/utils/image';
 
@@ -14,12 +14,15 @@ interface ArticleDetailProps {
 
 type EmotionState = Record<EmotionType, { isActive: boolean; count: number }>;
 
-const createEmotionState = (myEmotion: EmotionType | null): EmotionState => ({
-	LIKE: { isActive: myEmotion === "LIKE", count: 0 },
-	HEARTWARMING: { isActive: myEmotion === "HEARTWARMING", count: 0 },
-	SAD: { isActive: myEmotion === "SAD", count: 0 },
-	ANGRY: { isActive: myEmotion === "ANGRY", count: 0 },
-	WANT_FOLLOW_UP: { isActive: myEmotion === "WANT_FOLLOW_UP", count: 0 },
+const createEmotionState = (
+	myEmotion: EmotionType | null | undefined,
+	emotionCounts?: Partial<EmotionCounts>
+): EmotionState => ({
+	LIKE: { isActive: myEmotion === "LIKE", count: emotionCounts?.LIKE ?? 0 },
+	HEARTWARMING: { isActive: myEmotion === "HEARTWARMING", count: emotionCounts?.HEARTWARMING ?? 0 },
+	SAD: { isActive: myEmotion === "SAD", count: emotionCounts?.SAD ?? 0 },
+	ANGRY: { isActive: myEmotion === "ANGRY", count: emotionCounts?.ANGRY ?? 0 },
+	WANT_FOLLOW_UP: { isActive: myEmotion === "WANT_FOLLOW_UP", count: emotionCounts?.WANT_FOLLOW_UP ?? 0 },
 });
 
 const formatRelativeTime = (publishedDate: string) => {
@@ -41,27 +44,61 @@ const formatRelativeTime = (publishedDate: string) => {
 };
 
 export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
-	const [emotions, setEmotions] = useState<EmotionState>(() => createEmotionState(article.myEmotion ?? null));
+	const [emotions, setEmotions] = useState<EmotionState>(() =>
+		createEmotionState(article.myEmotion, article.emotionStats?.emotions)
+	);
+	const [isEmotionSubmitting, setIsEmotionSubmitting] = useState(false);
+	const [pendingEmotionType, setPendingEmotionType] = useState<EmotionType | null>(null);
 	const relativePublishedTime = formatRelativeTime(article.publishedDate);
 
 	useEffect(() => {
-		setEmotions(createEmotionState(article.myEmotion ?? null));
-	}, [article.myEmotion]);
+		setEmotions(createEmotionState(article.myEmotion, article.emotionStats?.emotions));
+	}, [article.myEmotion, article.emotionStats?.emotions]);
 
 	const handleEmotionToggle = async (type: EmotionType) => {
+		if (isEmotionSubmitting) return;
+
 		try {
+			setIsEmotionSubmitting(true);
+			setPendingEmotionType(type);
+			const activeEmotion = (Object.keys(emotions) as EmotionType[]).find((key) => emotions[key].isActive);
+			let prevEmotionResult: { emotionType: EmotionType; totalCount: number } | null = null;
+
+			if (activeEmotion && activeEmotion !== type) {
+				const prevRes = await userApi.toggleEmotion(article.articleId, { emotionType: activeEmotion });
+				prevEmotionResult = { emotionType: activeEmotion, totalCount: prevRes.totalCount };
+			}
+
 			const res = await userApi.toggleEmotion(article.articleId, { emotionType: type });
 			setEmotions((prev) => {
 				const next = { ...prev };
+
+				if (prevEmotionResult) {
+					next[prevEmotionResult.emotionType] = {
+						...next[prevEmotionResult.emotionType],
+						isActive: false,
+						count: prevEmotionResult.totalCount,
+					};
+				}
+
 				(Object.keys(next) as EmotionType[]).forEach((key) => {
 					next[key] = { ...next[key], isActive: false };
 				});
-				next[type] = { ...next[type], isActive: res.isActive, count: res.totalCount };
+
+				next[type] = {
+					...next[type],
+					isActive: res.isActive,
+					count: res.totalCount,
+				};
+
 				return next;
 			});
 		} catch (error) {
 			console.error("Failed to toggle emotion:", error);
 			alert("감정 표현을 반영하지 못했습니다.");
+		} finally {
+			setIsEmotionSubmitting(false);
+			setPendingEmotionType(null);
 		}
 	};
 
@@ -75,7 +112,7 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
 	return (
 		<div className="w-full min-h-screen bg-[#F9FAFB] flex flex-col items-center">
-			<div className="w-full max-w-[375px] bg-white relative min-h-screen pb-[100px] shadow-sm overflow-x-hidden">
+			<div className="w-full max-w-[375px] bg-white relative min-h-screen pb-[100px] shadow-sm">
 				
 				{/* Header */}
 				<header className="w-full h-[64px] bg-white border-b border-[#E5E7EB] flex items-center justify-between px-4 sticky top-0 z-50">
@@ -166,7 +203,7 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 									const s = styles[index % 3];
 									
 									return (
-										<div key={policy.id} onClick={() => window.open(policy.link, '_blank')} className={`w-full p-4 ${s.bg} border ${s.border} rounded-[12px] flex items-start gap-4 cursor-pointer active:scale-[0.98] transition-transform`}>
+										<div key={policy.policyId ?? policy.id ?? `${policy.title}-${index}`} onClick={() => window.open(policy.link, '_blank')} className={`w-full p-4 ${s.bg} border ${s.border} rounded-[12px] flex items-start gap-4 cursor-pointer active:scale-[0.98] transition-transform`}>
 											<div className={`w-12 h-12 rounded-lg ${s.iconBg} flex items-center justify-center shrink-0`}>
 												<s.Icon className={`w-5 h-5 ${s.iconColor}`} />
 											</div>
@@ -242,8 +279,8 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 								관련 기사
 							</h2>
 							<div className="flex flex-col gap-3">
-								{article.articleRelatedDTOS.map((related) => (
-									<div key={related.id} onClick={() => window.open(related.link, '_blank')} className="w-full p-[13px] bg-white border border-[#E5E7EB] rounded-[12px] flex gap-[12px] cursor-pointer active:scale-[0.98] transition-transform">
+								{article.articleRelatedDTOS.map((related, index) => (
+									<div key={related.articleId ?? related.id ?? `${related.title}-${index}`} onClick={() => window.open(related.link, '_blank')} className="w-full p-[13px] bg-white border border-[#E5E7EB] rounded-[12px] flex gap-[12px] cursor-pointer active:scale-[0.98] transition-transform">
 										{toRenderableImageUrl(related.imagePath) ? (
 											<img
 												src={toRenderableImageUrl(related.imagePath)!}
@@ -310,16 +347,24 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 
 				{/* Fixed Footer Reactions */}
 				<div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-[#E5E7EB] z-40">
-					<div className="w-full max-w-[375px] mx-auto h-[79px] px-4 flex items-center overflow-x-auto gap-2 no-scrollbar">
+					<div
+						className="w-full max-w-[375px] mx-auto h-[79px] px-4 flex items-center overflow-x-auto overflow-y-hidden gap-2 no-scrollbar touch-pan-x overscroll-x-contain"
+						style={{ WebkitOverflowScrolling: "touch" }}
+					>
 						{emotionButtons.map(({ type, label, Icon, color, bg, border, activeBg }) => {
 							const state = emotions[type];
 							return (
 								<button 
 									key={type}
 									onClick={() => handleEmotionToggle(type)}
-									className={`h-[46px] px-4 shrink-0 ${state.isActive ? activeBg : bg} border ${border} rounded-[12px] flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all`}
+									disabled={isEmotionSubmitting}
+									className={`h-[46px] w-[120px] min-w-[120px] px-3 shrink-0 ${state.isActive ? activeBg : bg} border ${border} rounded-[12px] flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all disabled:opacity-70`}
 								>
-									<Icon className={`w-[14px] h-[14px] ${color}`} />
+									{isEmotionSubmitting && pendingEmotionType === type ? (
+										<Loader2 className={`w-[14px] h-[14px] ${color} animate-spin`} />
+									) : (
+										<Icon className={`w-[14px] h-[14px] ${color}`} />
+									)}
 									<span className={`text-[14px] font-normal ${color} tracking-[-0.5px]`}>
 										{label} {state.count > 0 && ` ${state.count}`}
 									</span>
