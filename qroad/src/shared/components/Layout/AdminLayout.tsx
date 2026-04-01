@@ -1,6 +1,7 @@
 import { History, PlusCircle, MessageCircle, ChevronDown, User as UserIcon } from 'lucide-react';
 import { useLogout } from '@/hooks/admin/useAuth';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { BrandLogo } from '@/shared/components/BrandLogo';
 
 export const AdminLayout = () => {
   const logoutMutation = useLogout();
@@ -44,9 +45,7 @@ export const AdminLayout = () => {
         <div className="flex items-center justify-between h-full px-6">
           {/* Logo Title */}
           <div className="flex items-center">
-            <h1 className="font-semibold text-[20px] leading-[28px] tracking-[-0.5px] text-[#111827]">
-              QRoad Admin
-            </h1>
+            <BrandLogo className="h-[30px] sm:h-[34px] lg:h-[40px] w-auto max-w-[170px] sm:max-w-[190px] lg:max-w-[220px]" alt="QRoad Admin Logo" />
           </div>
 
           {/* User Profile */}

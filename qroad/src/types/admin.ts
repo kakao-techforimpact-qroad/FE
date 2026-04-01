@@ -69,7 +69,8 @@ export interface UserLandingPageResponse {
 
 // Article 상세 조회 응답
 export interface RelatedArticle {
-    id: number;
+    id?: number;
+    articleId?: number;
     title: string;
     content: string;
     link: string;
@@ -77,10 +78,19 @@ export interface RelatedArticle {
 }
 
 export interface RelatedPolicy {
-    id: number;
+    id?: number;
+    policyId?: number;
     title: string;
     content: string;
     link: string;
+}
+
+export type EmotionCounts = Record<EmotionType, number>;
+
+export interface EmotionStats {
+    articleId: number;
+    emotions: EmotionCounts;
+    totalCount: number;
 }
 
 export interface ArticleDetailResponse {
@@ -91,7 +101,8 @@ export interface ArticleDetailResponse {
     publishedDate: string;
     summary: string;
     keywords: string[];
-    myEmotion: EmotionType | null;
+    myEmotion?: EmotionType | null;
+    emotionStats?: EmotionStats;
     articleRelatedDTOS: RelatedArticle[];
     policyArticleRelatedDTOS: RelatedPolicy[];
 }
