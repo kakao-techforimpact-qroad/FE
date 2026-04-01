@@ -2,6 +2,7 @@ import { ImageOff, Loader2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserLandingPage } from '@/hooks/user/useLandingPage';
 import { toRenderableImageUrl } from '@/shared/utils/image';
+import { BrandLogo } from '@/shared/components/BrandLogo';
 
 interface ArticleListProps {
   onArticleClick: (id: number) => void;
@@ -38,9 +39,8 @@ export function ArticleList({ onArticleClick, articles, isLoading, publishedDate
     <div className="w-full min-h-screen bg-[#F9FAFB] flex flex-col items-center">
       <div className="w-full max-w-[375px] bg-[#F9FAFB] relative min-h-screen pb-[120px] shadow-sm">
         <header className="w-full h-[57px] bg-white border-b border-[#E5E7EB] flex items-center justify-between px-4 sticky top-0 z-50">
-          <div className="flex items-center gap-2">
-            <img src="/qr.svg" alt="QRoad Logo" className="w-[16px] h-[16px]" />
-            <span className="text-[20px] font-bold text-[#111827] tracking-[-0.5px]">QRoad</span>
+          <div className="flex items-center gap-2 -ml-1">
+            <BrandLogo className="h-[30px] sm:h-[34px] md:h-[38px] w-auto max-w-[145px] sm:max-w-[165px] md:max-w-[180px]" />
           </div>
           <a
             href="https://curly-marjoram-9d4.notion.site/2bbe6f94cb6d806281d6cfe611061601"
