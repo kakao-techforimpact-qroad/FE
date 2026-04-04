@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { 
-  ArrowLeft, Sparkles, Check, Building, User, ImageOff,
+  ArrowLeft, Sparkles, Check, Building, User,
   Landmark, Home, Coins, ThumbsUp, Heart, Frown, Angry, MessageSquareWarning, Loader2
 } from "lucide-react";
 import { ArticleDetailResponse, EmotionType, EmotionCounts } from '@/types/admin';
 import { userApi } from '@/api/user';
-import { toRenderableImageUrl } from '@/shared/utils/image';
+import { ArticleImage } from '@/shared/components/ArticleImage';
 
 interface ArticleDetailProps {
 	article: ArticleDetailResponse;
@@ -281,19 +281,14 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 							<div className="flex flex-col gap-3">
 								{article.articleRelatedDTOS.map((related, index) => (
 									<div key={related.articleId ?? related.id ?? `${related.title}-${index}`} onClick={() => window.open(related.link, '_blank')} className="w-full p-[13px] bg-white border border-[#E5E7EB] rounded-[12px] flex gap-[12px] cursor-pointer active:scale-[0.98] transition-transform">
-										{toRenderableImageUrl(related.imagePath) ? (
-											<img
-												src={toRenderableImageUrl(related.imagePath)!}
-												alt={related.title}
-												className="w-[80px] h-[80px] rounded-[8px] object-cover shrink-0"
-												loading="lazy"
-											/>
-										) : (
-											<div className="w-[80px] h-[80px] rounded-[8px] bg-[#F3F4F6] shrink-0 overflow-hidden flex flex-col items-center justify-center text-[#9CA3AF]">
-												<ImageOff className="w-4 h-4 mb-1" />
-												<span className="text-[10px] tracking-[-0.5px]">이미지 없음</span>
-											</div>
-										)}
+										<ArticleImage
+											imageUrl={related.imageUrl}
+											imagePath={related.imagePath}
+											alt={related.title}
+											className="w-[80px] h-[80px] rounded-[8px] object-cover shrink-0"
+											fallbackClassName="w-[80px] h-[80px] rounded-[8px] bg-[#F3F4F6] shrink-0 overflow-hidden flex flex-col items-center justify-center text-[#9CA3AF]"
+											fallbackLabelClassName="text-[10px] tracking-[-0.5px]"
+										/>
 										<div className="flex flex-col justify-center flex-1">
 											<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-2">
 												{related.title}
@@ -301,11 +296,6 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 											<p className="text-[12px] font-normal text-[#6B7280] leading-[16px] tracking-[-0.5px] mb-2 line-clamp-1">
 												{related.content}
 											</p>
-											<div className="flex items-center gap-1.5 text-[12px] font-normal text-[#9CA3AF] tracking-[-0.5px]">
-												<span>경제일보</span>
-												<span>•</span>
-												<span>1시간 전</span>
-											</div>
 										</div>
 									</div>
 								))}
@@ -319,9 +309,9 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 							</h2>
 							<div className="flex flex-col gap-3">
 								{[
-									{ title: "청년층 주거비 부담, 소득의 40% 육박", desc: "통계청 발표 청년 가구 평균 주거비 분석", pub: "경제일보", time: "1시간 전" },
-									{ title: "지방 청년 주거 지원도 확대 추진", desc: "국토부, 전국 광역시 대상 정책 확산", pub: "서울일보", time: "3시간 전" },
-									{ title: "서울시 \"청년 정책 예산 전년比 25% 증액\"", desc: "2024년 청년 지원 예산 8천억원 편성", pub: "한국일보", time: "5시간 전" }
+									{ title: "청년층 주거비 부담, 소득의 40% 육박", desc: "통계청 발표 청년 가구 평균 주거비 분석" },
+									{ title: "지방 청년 주거 지원도 확대 추진", desc: "국토부, 전국 광역시 대상 정책 확산" },
+									{ title: "서울시 \"청년 정책 예산 전년比 25% 증액\"", desc: "2024년 청년 지원 예산 8천억원 편성" }
 								].map((mock, idx) => (
 									<div key={idx} className="w-full p-[13px] bg-white border border-[#E5E7EB] rounded-[12px] flex gap-[12px] cursor-pointer active:scale-[0.98] transition-transform">
 										<div className="w-[80px] h-[80px] rounded-[8px] bg-[#E5E7EB] shrink-0 overflow-hidden relative" />
@@ -332,11 +322,6 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 											<p className="text-[12px] font-normal text-[#6B7280] leading-[16px] tracking-[-0.5px] mb-2 line-clamp-1">
 												{mock.desc}
 											</p>
-											<div className="flex items-center gap-1.5 text-[12px] font-normal text-[#9CA3AF] tracking-[-0.5px]">
-												<span>{mock.pub}</span>
-												<span>•</span>
-												<span>{mock.time}</span>
-											</div>
 										</div>
 									</div>
 								))}

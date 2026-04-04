@@ -1,12 +1,12 @@
-import { ImageOff, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserLandingPage } from '@/hooks/user/useLandingPage';
-import { toRenderableImageUrl } from '@/shared/utils/image';
 import { BrandLogo } from '@/shared/components/BrandLogo';
+import { ArticleImage } from '@/shared/components/ArticleImage';
 
 interface ArticleListProps {
   onArticleClick: (id: number) => void;
-  articles: Array<{ id: number; title: string; imagePath?: string }>;
+  articles: Array<{ id: number; title: string; imagePath?: string; imageUrl?: string }>;
   isLoading?: boolean;
   publishedDate?: string;
 }
@@ -28,12 +28,6 @@ export function ArticleList({ onArticleClick, articles, isLoading, publishedDate
   const mainArticle = articles[0] ?? null;
   const subArticles = articles.slice(1);
   const publishedDateLabel = publishedDate || '-';
-  const Placeholder = () => (
-    <div className="w-full h-full bg-[#F3F4F6] flex flex-col items-center justify-center text-[#9CA3AF]">
-      <ImageOff className="w-5 h-5 mb-1" />
-      <span className="text-[11px] tracking-[-0.5px]">이미지 없음</span>
-    </div>
-  );
 
   return (
     <div className="w-full min-h-screen bg-[#F9FAFB] flex flex-col items-center">
@@ -75,16 +69,13 @@ export function ArticleList({ onArticleClick, articles, isLoading, publishedDate
                 onClick={() => onArticleClick(mainArticle.id)}
                 className="w-full bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] rounded-[12px] overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
               >
-                {toRenderableImageUrl(mainArticle.imagePath) ? (
-                  <img
-                    src={toRenderableImageUrl(mainArticle.imagePath)!}
-                    alt={mainArticle.title}
-                    className="w-full aspect-[341/192] object-cover bg-[#F3F4F6]"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full aspect-[341/192]"><Placeholder /></div>
-                )}
+                <ArticleImage
+                  imageUrl={mainArticle.imageUrl}
+                  imagePath={mainArticle.imagePath}
+                  alt={mainArticle.title}
+                  className="w-full aspect-[341/192] object-cover bg-[#F3F4F6]"
+                  fallbackClassName="w-full aspect-[341/192] bg-[#F3F4F6] flex flex-col items-center justify-center text-[#9CA3AF]"
+                />
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-[12px] font-normal text-[#B91C1C] tracking-[-0.5px]">주요뉴스</span>
@@ -116,16 +107,13 @@ export function ArticleList({ onArticleClick, articles, isLoading, publishedDate
                     onClick={() => onArticleClick(article.id)}
                     className="w-full h-[106px] bg-white border border-[#E5E7EB] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] rounded-[12px] p-[13px] flex gap-[12px] cursor-pointer active:scale-[0.98] transition-transform"
                   >
-                    {toRenderableImageUrl(article.imagePath) ? (
-                      <img
-                        src={toRenderableImageUrl(article.imagePath)!}
-                        alt={article.title}
-                        className="w-[80px] h-[80px] rounded-[8px] object-cover shrink-0"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-[80px] h-[80px] rounded-[8px] shrink-0 overflow-hidden"><Placeholder /></div>
-                    )}
+                    <ArticleImage
+                      imageUrl={article.imageUrl}
+                      imagePath={article.imagePath}
+                      alt={article.title}
+                      className="w-[80px] h-[80px] rounded-[8px] object-cover shrink-0"
+                      fallbackClassName="w-[80px] h-[80px] rounded-[8px] bg-[#F3F4F6] shrink-0 overflow-hidden flex flex-col items-center justify-center text-[#9CA3AF]"
+                    />
                     <div className="flex flex-col flex-1 justify-center">
                       <div className="flex items-center gap-2 mb-1.5">
                         <span className="text-[12px] font-normal text-[#2563EB] tracking-[-0.5px]">뉴스</span>
@@ -187,6 +175,7 @@ export function QRLandingPage() {
     id: article.id,
     title: article.title,
     imagePath: article.imagePath,
+    imageUrl: article.imageUrl,
   }));
 
   return (
