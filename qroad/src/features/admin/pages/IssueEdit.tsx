@@ -142,7 +142,7 @@ export const IssueEdit = () => {
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const articlesPerPage = 6;
+    const articlesPerPage = 8;
 
     const handleGenerateQR = () => {
         setQrStatus(true);
@@ -374,28 +374,6 @@ export const IssueEdit = () => {
                                         <span className="font-['Noto_Sans_KR'] font-normal text-[12px] leading-[14px] tracking-[-0.5px] text-[#6B7280]">
                                             이 URL은 QR 코드 스캔 시 연결되는 주소입니다
                                         </span>
-                                    </div>
-                                </div>
-
-                                {/* QR Info Box */}
-                                <div className="w-[768px] h-[114px] bg-[#EFF6FF] border border-[#DBEAFE] rounded-[8px] p-[17px] flex gap-[12px] mb-[24px]">
-                                    <div className="mt-[2px]">
-                                        <Info className="w-[17.5px] h-[20px] text-[#2563EB]" />
-                                    </div>
-                                    <div className="flex flex-col flex-1 gap-[4px]">
-                                        <div className="font-['Noto_Sans_KR'] font-normal text-[14px] text-[#111827] mb-[4px]">QR 코드 정보</div>
-                                        <div className="flex justify-between w-[704px] items-center">
-                                            <span className="font-['Noto_Sans_KR'] font-normal text-[12px] text-[#4B5563]">생성일시:</span>
-                                            <span className="font-['Noto_Sans_KR'] font-normal text-[12px] text-[#4B5563]">{publication.published_date} 00:00</span>
-                                        </div>
-                                        <div className="flex justify-between w-[704px] items-center">
-                                            <span className="font-['Noto_Sans_KR'] font-normal text-[12px] text-[#4B5563]">스캔 횟수:</span>
-                                            <span className="font-['Noto_Sans_KR'] font-normal text-[12px] text-[#4B5563]">0회</span>
-                                        </div>
-                                        <div className="flex justify-between w-[704px] items-center">
-                                            <span className="font-['Noto_Sans_KR'] font-normal text-[12px] text-[#4B5563]">상태:</span>
-                                            <span className="font-['Noto_Sans_KR'] font-normal text-[12px] text-[#16A34A]">활성</span>
-                                        </div>
                                     </div>
                                 </div>
 

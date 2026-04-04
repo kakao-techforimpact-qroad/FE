@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { User, Lock, LayoutGrid } from 'lucide-react';
+import { User, Lock } from 'lucide-react';
 import { useLogin } from '@/hooks/admin/useAuth';
+import { BrandLogo } from '@/shared/components/BrandLogo';
 
 export const LoginPage = () => {
     const [loginId, setLoginId] = useState('');
@@ -24,12 +25,7 @@ export const LoginPage = () => {
                 
                 {/* Header Section */}
                 <div className="flex flex-col items-center mb-8">
-                    <div className="w-16 h-16 bg-[#0EA5E9] rounded-[12px] flex items-center justify-center shadow-sm">
-                        <LayoutGrid className="w-6 h-6 text-white" />
-                    </div>
-                    <h1 className="mt-[16px] font-semibold text-[24px] leading-[32px] text-center tracking-[-0.5px] text-[#111827]">
-                        QRoad Admin
-                    </h1>
+                    <BrandLogo className="h-[84px] sm:h-[100px] md:h-[120px] w-auto max-w-[230px] sm:max-w-[270px] md:max-w-[320px]" alt="QRoad Admin Logo" />
                     <p className="mt-[9px] font-normal text-[14px] leading-[20px] text-center tracking-[-0.5px] text-[#4B5563]">
                         관리자 로그인
                     </p>
