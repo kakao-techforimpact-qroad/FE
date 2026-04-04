@@ -1,5 +1,5 @@
-﻿import apiClient, { unwrapResponse } from '../client';
-import { GetReportsParams, Report, ReportListResponse, ReportStatus } from '@/types/admin';
+import apiClient, { unwrapResponse } from '../client';
+import { GetReportsParams, Report, ReportListResponse, ReportStatus, ReportDetailResponse } from '@/types/admin';
 
 const normalizeStatus = (status: unknown): ReportStatus => {
     if (status === 'unconfirmed' || status === 'in_review' || status === 'completed') {
@@ -61,6 +61,11 @@ export const reportsApi = {
 
     updateStatus: async (reportId: number, status: ReportStatus) => {
         const res = await apiClient.patch(`/api/admin/reports/${reportId}`, { status });
+        return unwrapResponse(res);
+    },
+
+    getById: async (reportId: number): Promise<ReportDetailResponse> => {
+        const res = await apiClient.get(`/api/admin/reports/${reportId}`);
         return unwrapResponse(res);
     },
 };
