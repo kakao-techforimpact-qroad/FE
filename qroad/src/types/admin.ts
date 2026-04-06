@@ -175,6 +175,15 @@ export interface CreateReportRequest {
     reporterContact: string;
 }
 
+export interface ReportDetailResponse {
+    id: number;
+    title: string;
+    content: string;
+    reporterContact: string;
+    status: string;
+    createdAt: string;
+}
+
 export interface CreateReportResponse {
     id: number;
     title: string;
