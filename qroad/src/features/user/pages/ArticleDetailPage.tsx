@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { 
   ArrowLeft, Sparkles, Check, Building, User,
-  Landmark, Home, Coins, ThumbsUp, Heart, Frown, Angry, MessageSquareWarning, Loader2
+  ThumbsUp, Heart, Frown, Angry, MessageSquareWarning, Loader2
 } from "lucide-react";
 import { ArticleDetailResponse, EmotionType, EmotionCounts } from '@/types/admin';
 import { userApi } from '@/api/user';
-import { ArticleImage } from '@/shared/components/ArticleImage';
 
 interface ArticleDetailProps {
 	article: ArticleDetailResponse;
@@ -195,26 +194,10 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 							</h2>
 							<div className="flex flex-col gap-3">
 								{article.policyArticleRelatedDTOS.map((policy, index) => {
-									const styles = [
-										{ bg: 'bg-[#EFF6FF]', border: 'border-[#E5E7EB]', iconBg: 'bg-[#EFF6FF]', iconColor: 'text-[#2563EB]', statusText: 'text-[#15803D]', status: '신청가능', agency: '서울시', Icon: Landmark },
-										{ bg: 'bg-white', border: 'border-[#E5E7EB]', iconBg: 'bg-[#FAF5FF]', iconColor: 'text-[#9333EA]', statusText: 'text-[#1D4ED8]', status: '진행중', agency: 'LH공사', Icon: Home },
-										{ bg: 'bg-white', border: 'border-[#E5E7EB]', iconBg: 'bg-[#FFF7ED]', iconColor: 'text-[#EA580C]', statusText: 'text-[#15803D]', status: '신청가능', agency: '주택도시기금', Icon: Coins },
-									];
-									const s = styles[index % 3];
-									
 									return (
-										<div key={policy.policyId ?? policy.id ?? `${policy.title}-${index}`} onClick={() => window.open(policy.link, '_blank')} className={`w-full p-4 ${s.bg} border ${s.border} rounded-[12px] flex items-start gap-4 cursor-pointer active:scale-[0.98] transition-transform`}>
-											<div className={`w-12 h-12 rounded-lg ${s.iconBg} flex items-center justify-center shrink-0`}>
-												<s.Icon className={`w-5 h-5 ${s.iconColor}`} />
-											</div>
-											<div className="flex flex-col justify-center flex-1">
-												<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-1">{policy.title}</h3>
-												<p className="text-[12px] font-normal text-[#4B5563] leading-[16px] tracking-[-0.5px] mb-2 line-clamp-1">{policy.content}</p>
-												<div className="flex items-center gap-2">
-													<span className={`text-[12px] font-normal ${s.statusText} tracking-[-0.5px]`}>{s.status}</span>
-													<span className="text-[12px] font-normal text-[#9CA3AF] tracking-[-0.5px]">{s.agency}</span>
-												</div>
-											</div>
+										<div key={policy.policyId ?? policy.id ?? `${policy.title}-${index}`} onClick={() => window.open(policy.link, '_blank')} className="w-full p-4 bg-white border border-[#E5E7EB] rounded-[12px] cursor-pointer active:scale-[0.98] transition-transform">
+											<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-1">{policy.title}</h3>
+											<p className="text-[12px] font-normal text-[#4B5563] leading-[16px] tracking-[-0.5px] line-clamp-2">{policy.content}</p>
 										</div>
 									);
 								})}
@@ -227,46 +210,19 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 								관련 정책
 							</h2>
 							<div className="flex flex-col gap-3">
-								<div className="w-full p-4 bg-white border border-[#E5E7EB] rounded-[12px] flex items-start gap-4 cursor-pointer active:scale-[0.98] transition-transform">
-									<div className="w-12 h-12 rounded-lg bg-[#EFF6FF] flex items-center justify-center shrink-0">
-										<Landmark className="w-5 h-5 text-[#2563EB]" />
-									</div>
-									<div className="flex flex-col justify-center flex-1">
-										<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-1">청년 월세 지원 사업</h3>
-										<p className="text-[12px] font-normal text-[#4B5563] leading-[16px] tracking-[-0.5px] mb-2 line-clamp-1">만 19-39세 청년에게 월 최대 30만원 지원</p>
-										<div className="flex items-center gap-2">
-											<span className="text-[12px] font-normal text-[#15803D] tracking-[-0.5px]">신청가능</span>
-											<span className="text-[12px] font-normal text-[#9CA3AF] tracking-[-0.5px]">서울시</span>
-										</div>
-									</div>
+								<div className="w-full p-4 bg-white border border-[#E5E7EB] rounded-[12px] cursor-pointer active:scale-[0.98] transition-transform">
+									<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-1">청년 월세 지원 사업</h3>
+									<p className="text-[12px] font-normal text-[#4B5563] leading-[16px] tracking-[-0.5px] line-clamp-2">만 19-39세 청년에게 월 최대 30만원 지원</p>
 								</div>
 								
-								<div className="w-full p-4 bg-white border border-[#E5E7EB] rounded-[12px] flex items-start gap-4 cursor-pointer active:scale-[0.98] transition-transform">
-									<div className="w-12 h-12 rounded-lg bg-[#FAF5FF] flex items-center justify-center shrink-0">
-										<Home className="w-5 h-5 text-[#9333EA]" />
-									</div>
-									<div className="flex flex-col justify-center flex-1">
-										<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-1">청년 임대주택 공급</h3>
-										<p className="text-[12px] font-normal text-[#4B5563] leading-[16px] tracking-[-0.5px] mb-2 line-clamp-1">시세 80% 이하 청년 전용 임대주택 공급</p>
-										<div className="flex items-center gap-2">
-											<span className="text-[12px] font-normal text-[#1D4ED8] tracking-[-0.5px]">진행중</span>
-											<span className="text-[12px] font-normal text-[#9CA3AF] tracking-[-0.5px]">LH공사</span>
-										</div>
-									</div>
+								<div className="w-full p-4 bg-white border border-[#E5E7EB] rounded-[12px] cursor-pointer active:scale-[0.98] transition-transform">
+									<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-1">청년 임대주택 공급</h3>
+									<p className="text-[12px] font-normal text-[#4B5563] leading-[16px] tracking-[-0.5px] line-clamp-2">시세 80% 이하 청년 전용 임대주택 공급</p>
 								</div>
 
-								<div className="w-full p-4 bg-white border border-[#E5E7EB] rounded-[12px] flex items-start gap-4 cursor-pointer active:scale-[0.98] transition-transform">
-									<div className="w-12 h-12 rounded-lg bg-[#FFF7ED] flex items-center justify-center shrink-0">
-										<Coins className="w-5 h-5 text-[#EA580C]" />
-									</div>
-									<div className="flex flex-col justify-center flex-1">
-										<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-1">청년 전월세 보증금 대출</h3>
-										<p className="text-[12px] font-normal text-[#4B5563] leading-[16px] tracking-[-0.5px] mb-2 line-clamp-1">최대 1억원, 연 1.5% 저금리 대출 지원</p>
-										<div className="flex items-center gap-2">
-											<span className="text-[12px] font-normal text-[#15803D] tracking-[-0.5px]">신청가능</span>
-											<span className="text-[12px] font-normal text-[#9CA3AF] tracking-[-0.5px]">주택도시기금</span>
-										</div>
-									</div>
+								<div className="w-full p-4 bg-white border border-[#E5E7EB] rounded-[12px] cursor-pointer active:scale-[0.98] transition-transform">
+									<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-1">청년 전월세 보증금 대출</h3>
+									<p className="text-[12px] font-normal text-[#4B5563] leading-[16px] tracking-[-0.5px] line-clamp-2">최대 1억원, 연 1.5% 저금리 대출 지원</p>
 								</div>
 							</div>
 						</section>
@@ -280,23 +236,13 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 							</h2>
 							<div className="flex flex-col gap-3">
 								{article.articleRelatedDTOS.map((related, index) => (
-									<div key={related.articleId ?? related.id ?? `${related.title}-${index}`} onClick={() => window.open(related.link, '_blank')} className="w-full p-[13px] bg-white border border-[#E5E7EB] rounded-[12px] flex gap-[12px] cursor-pointer active:scale-[0.98] transition-transform">
-										<ArticleImage
-											imageUrl={related.imageUrl}
-											imagePath={related.imagePath}
-											alt={related.title}
-											className="w-[80px] h-[80px] rounded-[8px] object-cover shrink-0"
-											fallbackClassName="w-[80px] h-[80px] rounded-[8px] bg-[#F3F4F6] shrink-0 overflow-hidden flex flex-col items-center justify-center text-[#9CA3AF]"
-											fallbackLabelClassName="text-[10px] tracking-[-0.5px]"
-										/>
-										<div className="flex flex-col justify-center flex-1">
-											<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-2">
-												{related.title}
-											</h3>
-											<p className="text-[12px] font-normal text-[#6B7280] leading-[16px] tracking-[-0.5px] mb-2 line-clamp-1">
-												{related.content}
-											</p>
-										</div>
+									<div key={related.articleId ?? related.id ?? `${related.title}-${index}`} onClick={() => window.open(related.link, '_blank')} className="w-full p-4 bg-white border border-[#E5E7EB] rounded-[12px] cursor-pointer active:scale-[0.98] transition-transform">
+										<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-2">
+											{related.title}
+										</h3>
+										<p className="text-[12px] font-normal text-[#6B7280] leading-[16px] tracking-[-0.5px] line-clamp-2">
+											{related.content}
+										</p>
 									</div>
 								))}
 							</div>
@@ -313,16 +259,13 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
 									{ title: "지방 청년 주거 지원도 확대 추진", desc: "국토부, 전국 광역시 대상 정책 확산" },
 									{ title: "서울시 \"청년 정책 예산 전년比 25% 증액\"", desc: "2024년 청년 지원 예산 8천억원 편성" }
 								].map((mock, idx) => (
-									<div key={idx} className="w-full p-[13px] bg-white border border-[#E5E7EB] rounded-[12px] flex gap-[12px] cursor-pointer active:scale-[0.98] transition-transform">
-										<div className="w-[80px] h-[80px] rounded-[8px] bg-[#E5E7EB] shrink-0 overflow-hidden relative" />
-										<div className="flex flex-col justify-center flex-1">
-											<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-2">
-												{mock.title}
-											</h3>
-											<p className="text-[12px] font-normal text-[#6B7280] leading-[16px] tracking-[-0.5px] mb-2 line-clamp-1">
-												{mock.desc}
-											</p>
-										</div>
+									<div key={idx} className="w-full p-4 bg-white border border-[#E5E7EB] rounded-[12px] cursor-pointer active:scale-[0.98] transition-transform">
+										<h3 className="text-[14px] font-normal text-[#111827] leading-[20px] tracking-[-0.5px] mb-1 line-clamp-2">
+											{mock.title}
+										</h3>
+										<p className="text-[12px] font-normal text-[#6B7280] leading-[16px] tracking-[-0.5px] line-clamp-2">
+											{mock.desc}
+										</p>
 									</div>
 								))}
 							</div>
