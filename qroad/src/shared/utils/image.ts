@@ -2,6 +2,7 @@ const PUBLIC_IMAGE_BASE_URL =
     import.meta.env.VITE_S3_PUBLIC_BASE_URL ||
     import.meta.env.VITE_IMAGE_BASE_URL ||
     '';
+const ARTICLE_PLACEHOLDER_KEY = 'ai-images/placeholder.png';
 
 function trimSlashes(value: string): string {
     return value.replace(/^\/+|\/+$/g, '');
@@ -29,5 +30,9 @@ export function toRenderableImageUrl(imagePath?: string | null): string | null {
     const base = trimSlashes(PUBLIC_IMAGE_BASE_URL);
     const key = trimSlashes(raw);
     return `${base}/${key}`;
+}
+
+export function getArticlePlaceholderImageUrl(): string | null {
+    return toRenderableImageUrl(ARTICLE_PLACEHOLDER_KEY);
 }
 

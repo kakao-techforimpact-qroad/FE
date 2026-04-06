@@ -142,7 +142,7 @@ export const IssueEdit = () => {
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const articlesPerPage = 6;
+    const articlesPerPage = 8;
 
     const handleGenerateQR = () => {
         setQrStatus(true);

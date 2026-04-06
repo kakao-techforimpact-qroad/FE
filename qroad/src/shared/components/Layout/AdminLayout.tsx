@@ -44,7 +44,11 @@ export const AdminLayout = () => {
       <header className="absolute w-full h-[65px] left-0 top-0 bg-[#FFFFFF] border-b border-[#E5E7EB] z-50">
         <div className="flex items-center justify-between h-full px-6">
           {/* Logo Title */}
-          <div className="flex items-center">
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => navigate('/admin/issues')}
+            title="홈으로 이동"
+          >
             <BrandLogo className="h-[30px] sm:h-[34px] lg:h-[40px] w-auto max-w-[170px] sm:max-w-[190px] lg:max-w-[220px]" alt="QRoad Admin Logo" />
           </div>
 
