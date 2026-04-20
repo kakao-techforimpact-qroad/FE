@@ -1,16 +1,14 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 
-// User Pages
+// 사용자 페이지
 import { QRLandingPage } from '@/features/user/pages/qrlandingPage'
 import { ArticleDetailWrapper } from '@/features/user/pages/ArticleDetailPageWrapper'
-import { ReportPage } from '@/features/user/pages/ReportPage'
 
-// Admin Pages
+// 관리자 페이지
 import { LoginPage } from '@/features/admin/pages/LoginPage'
 import { IssueList } from '@/features/admin/pages/IssueList'
 import { IssueCreate } from '@/features/admin/pages/IssueCreate'
 import { IssueEdit } from '@/features/admin/pages/IssueEdit'
-import { ReportList } from '@/features/admin/pages/ReportList'
 import { ProtectedRoute } from '@/features/admin/components/ProtectedRoute'
 import { AdminLayout } from '@/shared/components/Layout/AdminLayout'
 
@@ -19,7 +17,6 @@ export const router = createBrowserRouter([
     path: '/',
     element: <Navigate to="/admin/login" replace />,
   },
-  // 사용자 페이지
   {
     path: '/a/:paperId',
     element: <QRLandingPage />,
@@ -28,11 +25,6 @@ export const router = createBrowserRouter([
     path: '/article/:articleId',
     element: <ArticleDetailWrapper />,
   },
-  {
-    path: '/report',
-    element: <ReportPage />,
-  },
-  // 관리자 페이지
   {
     path: '/admin/login',
     element: <LoginPage />,
@@ -60,10 +52,6 @@ export const router = createBrowserRouter([
       {
         path: 'issues/:id',
         element: <IssueEdit />,
-      },
-      {
-        path: 'reports',
-        element: <ReportList />,
       },
     ],
   },
