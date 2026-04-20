@@ -43,8 +43,8 @@ git push -u origin main
 - Install Command: `npm install`
 
 **Environment Variables**:
-```
-VITE_API_BASE_URL = (비워두기)
+```bash
+VITE_API_BASE_URL=https://YOUR_BACKEND_URL
 ```
 
 ### 2.3 도메인 설정
@@ -52,7 +52,7 @@ VITE_API_BASE_URL = (비워두기)
 1. **Settings → Domains**
 2. **Add Domain**: `qroad.info` 입력
 3. **Add** 클릭
-4. DNS 설정 확인 (이미 설정되어 있음)
+4. DNS 설정 확인
 
 ## 3. 자동 배포 설정
 
@@ -84,7 +84,6 @@ git push origin main
 
 - **Deployments** 탭에서 배포 상태 확인
 - **Logs** 탭에서 빌드 로그 확인
-- **Functions** 탭에서 Serverless Functions 확인 (있다면)
 
 ### 4.2 배포 URL
 
@@ -98,7 +97,7 @@ git push origin main
 1. **Settings → Environment Variables**
 2. **Add New**:
    - Name: `VITE_API_BASE_URL`
-   - Value: (비워두기)
+   - Value: `https://YOUR_BACKEND_URL`
    - Environment: Production, Preview, Development 모두 선택
 3. **Save**
 
@@ -124,16 +123,14 @@ git push origin main
 3. **환경 변수 확인**:
    - Settings → Environment Variables 확인
 
-### CORS 에러 시
+### API 연결 오류 시
 
-1. **vercel.json 확인**:
-   - rewrites 설정 확인
-   - 배포 후 적용되었는지 확인
+1. **환경 변수 확인**:
+   - `VITE_API_BASE_URL` 값이 올바른지 확인
 
-2. **백엔드 CORS 설정 확인**:
+2. **백엔드 헬스 체크**:
    ```bash
-   curl -I https://api.qroad.info/api/admin/login \
-     -H "Origin: https://qroad.info"
+   curl -I https://YOUR_BACKEND_URL/api/admin/login
    ```
 
 ## 7. Git 워크플로우
@@ -152,8 +149,6 @@ git commit -m "Add: new feature"
 git push origin feature/new-feature
 ```
 
-→ Vercel이 자동으로 프리뷰 배포 생성
-
 ### 7.2 프로덕션 배포
 
 ```bash
@@ -167,15 +162,13 @@ git merge feature/new-feature
 git push origin main
 ```
 
-→ Vercel이 자동으로 `qroad.info`에 배포
-
 ## 8. 체크리스트
 
 배포 전 확인:
 
 - [ ] GitHub 저장소 생성 및 코드 push
 - [ ] Vercel과 GitHub 저장소 연동
-- [ ] 환경 변수 설정 (`VITE_API_BASE_URL` 비워두기)
+- [ ] 환경 변수 설정 (`VITE_API_BASE_URL`)
 - [ ] 도메인 설정 (`qroad.info`)
 - [ ] 로컬 빌드 테스트 성공
 - [ ] main 브랜치에 push하여 배포

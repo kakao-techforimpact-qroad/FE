@@ -106,7 +106,7 @@ export const LoginPage = () => {
                 {/* Footer Copy */}
                 <div className="mt-6 text-center">
                     <p className="font-normal text-[12px] leading-[16px] tracking-[-0.5px] text-[#6B7280]">
-                        © 2024 QRoad Admin. 모든 권리 보유.
+                        © 2026 QRoad Admin. 모든 권리 보유.
                     </p>
                 </div>
 
