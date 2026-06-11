@@ -72,7 +72,6 @@ export function ArticleList({ onArticleClick, articles, isLoading, publishedDate
                   imagePath={mainArticle.imagePath}
                   alt={mainArticle.title}
                   className="w-full aspect-[341/192] object-cover bg-[#F3F4F6]"
-                  fallbackClassName="w-full aspect-[341/192] bg-[#F3F4F6] flex flex-col items-center justify-center text-[#9CA3AF]"
                 />
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-2">
@@ -110,7 +109,6 @@ export function ArticleList({ onArticleClick, articles, isLoading, publishedDate
                       imagePath={article.imagePath}
                       alt={article.title}
                       className="w-[80px] h-[80px] rounded-[8px] object-cover shrink-0"
-                      fallbackClassName="w-[80px] h-[80px] rounded-[8px] bg-[#F3F4F6] shrink-0 overflow-hidden flex flex-col items-center justify-center text-[#9CA3AF]"
                     />
                     <div className="flex flex-col flex-1 justify-center">
                       <div className="flex items-center gap-2 mb-1.5">

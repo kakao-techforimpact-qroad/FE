@@ -6,9 +6,6 @@ interface ArticleImageProps {
   imagePath?: string | null;
   alt: string;
   className: string;
-  fallbackClassName?: string;
-  fallbackLabelClassName?: string;
-  fallbackLabel?: string;
   loading?: 'lazy' | 'eager';
 }
 
@@ -17,9 +14,6 @@ export function ArticleImage({
   imagePath,
   alt,
   className,
-  fallbackClassName = 'w-full h-full bg-[#F3F4F6] flex flex-col items-center justify-center text-[#9CA3AF]',
-  fallbackLabelClassName = 'text-[11px] tracking-[-0.5px]',
-  fallbackLabel = '이미지 없음',
   loading = 'lazy',
 }: ArticleImageProps) {
   const primarySrc = useMemo(() => {
