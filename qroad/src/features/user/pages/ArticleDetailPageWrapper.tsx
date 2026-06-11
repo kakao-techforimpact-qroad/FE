@@ -2,6 +2,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArticleDetail } from './ArticleDetailPage';
 import { useArticleDetail } from '@/hooks/user/useLandingPage';
 import { Loader2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from '@/shared/components/ui/alert-dialog';
 
 export function ArticleDetailWrapper() {
   const navigate = useNavigate();
@@ -21,17 +30,23 @@ export function ArticleDetailWrapper() {
 
   if (error || !article) {
     return (
-      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center p-4">
-        <div className="w-full max-w-[375px] bg-white rounded-2xl p-6 shadow-sm border border-[#E5E7EB] text-center">
-          <p className="text-[#111827] font-medium mb-2">기사를 찾을 수 없습니다.</p>
-          <p className="text-[14px] text-[#B91C1C] mb-4">{String(error ?? '')}</p>
-          <button
-            onClick={() => navigate(-1)}
-            className="px-6 py-2 rounded-full bg-[#2563EB] text-white text-sm font-semibold"
-          >
-            뒤로가기
-          </button>
-        </div>
+      <div className="min-h-screen bg-[#F9FAFB] flex flex-col items-center">
+        <div className="w-full max-w-[375px] bg-white relative min-h-screen shadow-sm" />
+        <AlertDialog open={true} onOpenChange={(open) => { if (!open) navigate(-1); }}>
+          <AlertDialogContent className="w-[90%] max-w-[340px] rounded-[16px]">
+            <AlertDialogHeader>
+              <AlertDialogTitle>기사를 찾을 수 없습니다</AlertDialogTitle>
+              <AlertDialogDescription>
+                {String(error ?? '기사 데이터가 존재하지 않습니다.')}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={() => navigate(-1)} className="bg-[#2563EB] text-white">
+                확인
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     );
   }

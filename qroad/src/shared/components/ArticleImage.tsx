@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ImageOff } from 'lucide-react';
 import { getArticlePlaceholderImageUrl, toRenderableImageUrl } from '@/shared/utils/image';
 
 interface ArticleImageProps {
@@ -44,12 +43,7 @@ export function ArticleImage({
   };
 
   if (!src) {
-    return (
-      <div className={fallbackClassName}>
-        <ImageOff className="w-5 h-5 mb-1" />
-        <span className={fallbackLabelClassName}>{fallbackLabel}</span>
-      </div>
-    );
+    return null;
   }
 
   return (
